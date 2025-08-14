@@ -72,7 +72,6 @@ typedef struct{
 
 void chip8_init(bool, log_type_t, uint8_t *bin, size_t size);
 int chip8_run();
-chip8_vm_t *chip8_get_state();
 void chip8_step();
 void chip8_load_fonts(void);
 void chip8_load_memory(uint8_t *,size_t);

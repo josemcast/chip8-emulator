@@ -31,10 +31,6 @@ void chip8_init(bool log_enable, log_type_t lt, uint8_t *bin, size_t size){
         init_log(lt);       
 }
 
-chip8_vm_t *chip8_get_state(){
-    return &vm;
-}
-
 void chip8_load_memory(uint8_t *bin, size_t size){
     printf("Loading binary into memory...Start addr 0x%x with size 0x%lx\n", ROM_INIT, size);
     uint8_t *dst = (vm.memory + ROM_INIT);
@@ -68,9 +64,44 @@ void chip8_dump_memory(){
     fclose(fp);
 }
 
+void chip8_dump_state(){
+    printf("==========================================================\n");
+    printf("PC:%3lX\n", (vm.pc - vm.memory));
+    printf("I:%3X\n", vm.index);
+    for (int i = 0; i < VX_COUNT; i++){
+        if(i % 4 == 0)
+            printf("\n");
+        printf("V%1X:%3d ", i, vm.registers[i]);
+    }
+    printf("\nstack:");
+    for(int i = 0; i<STACK_SIZE; i++)
+    {
+        if (i % 8 == 0)
+            printf("\n");
+        printf("%3X ", vm.stack[i]);
+    }
+    printf("\n==========================================================\n");
+}
+
 static uint16_t chip8_fetch(){
     uint16_t op = (uint16_t)*(vm.pc++); 
     return (op << 8) | *(vm.pc++);
+}
+
+static void chip8_stack_push(uint16_t nnn){
+    if((vm.sp + 1) == STACK_SIZE){
+        printf("Stack is full\n");
+        exit(1);
+    }
+    vm.stack[++vm.sp] = nnn;
+}
+
+static uint16_t chip8_stack_pop(){
+    if(vm.sp == -1){
+        printf("Stack is empty\n");
+        exit(1);
+    }
+    return vm.stack[vm.sp--];
 }
 
 static void opcode0_handler(uint16_t mi){
@@ -80,6 +111,9 @@ static void opcode0_handler(uint16_t mi){
     {
         case 0xE0:
             clear_screen();
+            break;
+        case 0xEE:
+            vm.pc = (vm.memory + chip8_stack_pop());
             break;
         default:
             printf("not implemented yet\n");
@@ -96,6 +130,8 @@ static void opcode1_handler(uint16_t mi){
 
 static void opcode2_handler(uint16_t mi){
     log_debug("opcode 2");
+    chip8_stack_push((vm.pc - vm.memory));
+    vm.pc = (vm.memory + ADDR_GET(mi));
 }
 
 static void opcode3_handler(uint16_t mi){
@@ -180,8 +216,8 @@ int chip8_run() {
             deinit_log();
             return 1;
         }
-
         process_opcodes[opcode](mi);
+        chip8_dump_state();
     }
 }
 
