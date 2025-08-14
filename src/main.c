@@ -2,21 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-
 #include <log.h>
-
-
-#ifdef MAJOR_REV
-uint8_t major = MAJOR_REV;
-#else
-uint8_t major = 0;
-#endif
-
-#ifdef MINOR_REV
-uint8_t minor = MINOR_REV;
-#else
-uint8_t minor = 3;
-#endif
 
 #define BIN_BUFFER_SIZE         256
 
@@ -29,11 +15,13 @@ uint8_t minor = 3;
 #include <utilities.h>
 
 int main(int argc, char *argv[]) {
-    printf("chip8 Emulator v%d.%d\n\n", major, minor);
+
+    log_info("CHIP8 Emulator\n\n");
 
     InitWindow(RL_SCREEN_WIDTH, RL_SCREEN_HEIGHT, "CHIP8-Emulator");
     SetTargetFPS(60);
 
+    //Load binary from testbin folder - default IMB logo
     uint8_t buffer[BIN_BUFFER_SIZE];
     FILE *fp = fopen("testbin/ibm_logo.ch8", "rb");
     if (fp == NULL)
@@ -42,18 +30,16 @@ int main(int argc, char *argv[]) {
     size_t bytes = fread(buffer, sizeof(uint8_t), BIN_BUFFER_SIZE, fp);
     fclose(fp);
 
+    //internal log disabled - only used for debug purposes
     chip8_init(false, CHIP8_LOG_INFO, buffer, bytes);
     
     //chip8_dump_memory();
     //printf("Result: %d\n", chip8_run(bytecodes));
 
     chip8_display_t  *display;
-
-    // chip8_vm_t *state;
     while(!WindowShouldClose()){
-        //state = chip8_get_state();
         chip8_step();
-        display = get_screen();  
+        display = get_screen(); //Get current display state from emulator 
         BeginDrawing();
         ClearBackground(RAYWHITE);
         for(int i = 0; i<CHIP8_SCREEN_HEIGHT; ++i){

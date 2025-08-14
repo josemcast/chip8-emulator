@@ -1,13 +1,10 @@
-MAJOR_REV = 0
-MINOR_REV = 5
-
 INC = inc
 SRC := $(shell find . -name '*.c')
 BUILDIR = build
 CC = gcc
 CFLAGS = -g -Wall -Werror
-LDFLAGS =  -I$(INC) -DMAJOR_REV=$(MAJOR_REV) -DMINOR_REV=$(MINOR_REV) -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
-OUTBIN = out
+LDFLAGS =  -I$(INC) -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+OUTBIN = chip8
 
 
 all: $(SRC)

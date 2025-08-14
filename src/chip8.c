@@ -33,6 +33,7 @@ void chip8_init(bool log_enable, log_type_t lt, uint8_t *bin, size_t size){
 chip8_vm_t *chip8_get_state(){
     return &vm;
 }
+
 void chip8_load_memory(uint8_t *bin, size_t size){
     printf("Loading binary into memory...Start addr 0x%x\n", ROM_INIT);
     uint8_t *dst = (vm.memory + ROM_INIT);
@@ -79,7 +80,6 @@ static void opcode0_handler(uint16_t mi){
         case 0xE0:
             clear_screen();
             break;
-    
         default:
             printf("not implemented yet\n");
             break;
@@ -95,22 +95,18 @@ static void opcode1_handler(uint16_t mi){
 
 static void opcode2_handler(uint16_t mi){
     log_debug("opcode 2");
-    //printf("%X \n", mi);
 }
 
 static void opcode3_handler(uint16_t mi){
     log_debug("opcode 3");
-    //printf("%X \n", mi);
 }
 
 static void opcode4_handler(uint16_t mi){
     log_debug("opcode 4");
-    //printf("%X \n", mi);
 }
 
 static void opcode5_handler(uint16_t mi){
     log_debug("opcode 5");
-    //printf("%X \n", mi);
 }
 
 //set VX to NN
@@ -143,6 +139,7 @@ static void opcodeD_handler(uint16_t mi){
     }
 }
 
+//placeholder for future opcode handlers
 static void opcodeN_handler(uint16_t mi)
 {
     //TO DO
