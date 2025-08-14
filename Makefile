@@ -15,6 +15,9 @@ all: $(SRC)
 run: all
 	@./build/$(OUTBIN)
 
+debug: all
+	@./build/$(OUTBIN) -c
+
 clean:
 	@rm -rf $(BUILDIR)
 	@rm -rf *.log

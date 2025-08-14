@@ -1,7 +1,7 @@
 #include <log.h>
 
 static log_type_t current_log_level = CHIP8_LOG_INFO;
-static char log_to_file = 1;
+static char log_to_file = 0;
 static FILE *fp = NULL;
 
 void init_log(log_type_t ll) {
@@ -9,9 +9,11 @@ void init_log(log_type_t ll) {
     if (fp != NULL)
         return;
 
-    fp = fopen("chip8_run.log", "w");
+    if (log_to_file)
+        fp = fopen("chip8_run.log", "w");
+    
     if (NULL == fp){
-        perror("Could not open file for logging...fallbacking to stdout");
+        //perror("Could not open file for logging...fallbacking to stdout");
         log_to_file = 0;
     }
 
@@ -29,7 +31,7 @@ void set_log_level(log_type_t ll) {
 
 void add_log(log_type_t lt, const char * msg, const char* func, const char *file, size_t line) {
     
-    if (fp == NULL)
+    if ((fp == NULL) && (log_to_file == 1))
         return;
     
     if (log_to_file){

@@ -16,6 +16,7 @@ void chip8_init(bool log_enable, log_type_t lt, uint8_t *bin, size_t size){
     vm = (chip8_vm_t){0};
     vm.sp = -1;
     
+    printf("\n\n");
     chip8_load_fonts();
     chip8_load_memory(bin, size);
     
@@ -35,7 +36,7 @@ chip8_vm_t *chip8_get_state(){
 }
 
 void chip8_load_memory(uint8_t *bin, size_t size){
-    printf("Loading binary into memory...Start addr 0x%x\n", ROM_INIT);
+    printf("Loading binary into memory...Start addr 0x%x with size 0x%lx\n", ROM_INIT, size);
     uint8_t *dst = (vm.memory + ROM_INIT);
     uint8_t *src = (uint8_t*)bin;
     uint16_t i = 0;
@@ -169,7 +170,6 @@ int chip8_run() {
     if (!running)
         return 1;
 
-    log_debug("Starting processing");
     printf("\nRunning...\n");
 
     while(1){
