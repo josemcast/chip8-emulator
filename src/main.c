@@ -22,8 +22,6 @@ int main(int argc, char *argv[]) {
             debug_mode = 1;
     }
 
-    log_info("CHIP8 Emulator\n\n");
-
     if (!debug_mode){
        InitWindow(RL_SCREEN_WIDTH, RL_SCREEN_HEIGHT, "CHIP8-Emulator");
         SetTargetFPS(60);
@@ -43,20 +41,18 @@ int main(int argc, char *argv[]) {
     size_t bytes = fread(buffer, sizeof(uint8_t), BIN_BUFFER_SIZE, fp);
     fclose(fp);
 
-    //internal log disabled - only used for debug purposes
-    //chip8_init(false, CHIP8_LOG_INFO, buffer, bytes);
-    
     //chip8_dump_memory();
-    //printf("Result: %d\n", chip8_run(bytecodes));
+
     if(debug_mode){
         chip8_init(true, CHIP8_LOG_DEBUG, buffer, bytes);
         printf("Result: %d\n", chip8_run());
     }else {
-        chip8_init(false, CHIP8_LOG_INFO, buffer, bytes);
+        chip8_init(true, CHIP8_LOG_DEBUG, buffer, bytes);
         chip8_display_t  *display;
         while(!WindowShouldClose()){
             chip8_step();
             display = get_screen(); //Get current display state from emulator 
+            
             BeginDrawing();
             ClearBackground(RAYWHITE);
             for(int i = 0; i<CHIP8_SCREEN_HEIGHT; ++i){

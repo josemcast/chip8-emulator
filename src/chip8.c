@@ -16,7 +16,8 @@ void chip8_init(bool log_enable, log_type_t lt, uint8_t *bin, size_t size){
     vm = (chip8_vm_t){0};
     vm.sp = -1;
     
-    printf("\n\n");
+    init_log(log_enable, lt);
+
     chip8_load_fonts();
     chip8_load_memory(bin, size);
     
@@ -26,13 +27,11 @@ void chip8_init(bool log_enable, log_type_t lt, uint8_t *bin, size_t size){
     
     running = 1;
 
-    init_screen();
-    if (log_enable == true)
-        init_log(lt);       
+    init_screen();       
 }
 
 void chip8_load_memory(uint8_t *bin, size_t size){
-    printf("Loading binary into memory...Start addr 0x%x with size 0x%lx\n", ROM_INIT, size);
+    CHIP8_TRACELOG(CHIP8_LOG_INFO, "Loading binary into memory...Start addr 0x%x with size 0x%lx\n", ROM_INIT, size);
     uint8_t *dst = (vm.memory + ROM_INIT);
     uint8_t *src = (uint8_t*)bin;
     uint16_t i = 0;
@@ -43,7 +42,7 @@ void chip8_load_memory(uint8_t *bin, size_t size){
 }
 
 void chip8_load_fonts(){
-    printf("Loading fonts at 0x%x\n", FONTS_INIT);
+    CHIP8_TRACELOG(CHIP8_LOG_INFO, "Loading fonts at 0x%x\n", FONTS_INIT);
     uint8_t *dst = (vm.memory + FONTS_INIT);
     uint8_t *src = chip8_fonts;
     uint16_t i = 0;
@@ -56,7 +55,7 @@ void chip8_load_fonts(){
 void chip8_dump_memory(){
     FILE *fp = fopen("chip8_memdump.bin", "wb");
     if(fp == NULL){
-        printf("Could not open file to dump memory\n");
+        CHIP8_TRACELOG(CHIP8_LOG_ERROR,"Could not open file to dump memory\n");
         return;
     }
 
@@ -65,22 +64,23 @@ void chip8_dump_memory(){
 }
 
 void chip8_dump_state(){
-    printf("==========================================================\n");
-    printf("PC:%3lX\n", (vm.pc - vm.memory));
-    printf("I:%3X\n", vm.index);
+    
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "==========================================================\n");
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "PC:%3lX\n", (vm.pc - vm.memory));
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "I:%3X\n", vm.index);
     for (int i = 0; i < VX_COUNT; i++){
         if(i % 4 == 0)
-            printf("\n");
-        printf("V%1X:%3d ", i, vm.registers[i]);
+            CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "\n");
+        CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "V%1X:%3d ", i, vm.registers[i]);
     }
-    printf("\nstack:");
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "\nstack:");
     for(int i = 0; i<STACK_SIZE; i++)
     {
         if (i % 8 == 0)
-            printf("\n");
-        printf("%3X ", vm.stack[i]);
+            CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "\n");
+        CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "%3X ", vm.stack[i]);
     }
-    printf("\n==========================================================\n");
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "\n==========================================================\n");
 }
 
 static uint16_t chip8_fetch(){
@@ -90,7 +90,7 @@ static uint16_t chip8_fetch(){
 
 static void chip8_stack_push(uint16_t nnn){
     if((vm.sp + 1) == STACK_SIZE){
-        printf("Stack is full\n");
+        CHIP8_TRACELOG(CHIP8_LOG_ERROR, "Stack is full\n");
         exit(1);
     }
     vm.stack[++vm.sp] = nnn;
@@ -98,14 +98,14 @@ static void chip8_stack_push(uint16_t nnn){
 
 static uint16_t chip8_stack_pop(){
     if(vm.sp == -1){
-        printf("Stack is empty\n");
+        CHIP8_TRACELOG(CHIP8_LOG_ERROR, "Stack is empty\n");
         exit(1);
     }
     return vm.stack[vm.sp--];
 }
 
 static void opcode0_handler(uint16_t mi){
-    log_debug("opcode 0");
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 0 - %X\n", mi);
     uint8_t mode = IMME_GET(mi);
     switch (mode)
     {
@@ -116,7 +116,7 @@ static void opcode0_handler(uint16_t mi){
             vm.pc = (vm.memory + chip8_stack_pop());
             break;
         default:
-            printf("not implemented yet\n");
+            CHIP8_TRACELOG(CHIP8_LOG_ERROR, "not implemented yet\n");
             break;
     }
 
@@ -124,49 +124,49 @@ static void opcode0_handler(uint16_t mi){
 
 //jump to NNN
 static void opcode1_handler(uint16_t mi){
-    log_debug("opcode 1");
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 1 - %X\n", mi);
     vm.pc = (vm.memory + ADDR_GET(mi));
 }
 
 static void opcode2_handler(uint16_t mi){
-    log_debug("opcode 2");
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 2 - %X\n", mi);
     chip8_stack_push((vm.pc - vm.memory));
     vm.pc = (vm.memory + ADDR_GET(mi));
 }
 
 static void opcode3_handler(uint16_t mi){
-    log_debug("opcode 3");
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 3 - %X\n", mi);
 }
 
 static void opcode4_handler(uint16_t mi){
-    log_debug("opcode 4");
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 4 - %X\n", mi);
 }
 
 static void opcode5_handler(uint16_t mi){
-    log_debug("opcode 5");
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 5 - %X\n", mi);
 }
 
 //set VX to NN
 static void opcode6_handler(uint16_t mi){
-    log_debug("opcode 6");
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 6 - %X\n", mi);
     vm.registers[VX_GET(mi)] = IMME_GET(mi);
 }
 
 //Add NN to VX
 static void opcode7_handler(uint16_t mi){
-    log_debug("opcode 7");
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 7 - %X\n", mi);
     vm.registers[VX_GET(mi)] += IMME_GET(mi);
 }
 
 //Set index to NNN
 static void opcodeA_handler(uint16_t mi){
-    log_debug("opcode A");
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode A - %X\n", mi);
     vm.index = ADDR_GET(mi);
 }
 
 //Display
 static void opcodeD_handler(uint16_t mi){
-    log_debug("opcode D");
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode D - %X\n", mi);
     uint8_t vx = vm.registers[VX_GET(mi)];
     uint8_t vy = vm.registers[VY_GET(mi)];
     uint8_t n = NIBBLE_GET(mi);
@@ -206,7 +206,7 @@ int chip8_run() {
     if (!running)
         return 1;
 
-    printf("\nRunning...\n");
+    CHIP8_TRACELOG(CHIP8_LOG_INFO, "\nRunning...\n");
 
     while(1){
         uint16_t mi = chip8_fetch();
