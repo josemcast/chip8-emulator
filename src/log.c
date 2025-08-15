@@ -49,8 +49,8 @@ void add_log(log_type_t lt, const char * msg, ...) {
             va_end(args);
             return;
         }
-        char buffer[LOG_BUFFER_SIZE];
-        int bw = vsnprintf(buffer, LOG_BUFFER_SIZE, msg, args);
+        char buffer[LOG_BUFFER_MSG_SIZE];
+        int bw = vsnprintf(buffer, LOG_BUFFER_MSG_SIZE, msg, args);
         fwrite(buffer, sizeof(char), bw, fp);
     }else {
         if (lt <= current_log_level)

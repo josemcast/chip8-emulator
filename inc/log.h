@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#define LOG_BUFFER_SIZE 256
+#define LOG_BUFFER_MSG_SIZE 256
 
 typedef enum {
     CHIP8_LOG_ERROR,

@@ -59,16 +59,15 @@ int main(int argc, char *argv[]) {
             const uint8_t scale_factor = 4; //scale 4X: from 64 x 32  to 256 x 128
             for(int i = 0; i<CHIP8_SCREEN_HEIGHT; ++i){
                 for(int j = 0; j < CHIP8_SCREEN_WIDTH; ++j){
-                    if(display->matrix[i][j] == 1){ 
-                        uint32_t col = scale_factor*j + (RL_SCREEN_WIDTH / 2) - scale_factor*(CHIP8_SCREEN_WIDTH / 2);
-                        uint32_t row = scale_factor*i;
-                        for(int dy = 0; dy < scale_factor; ++dy){
-                            uint32_t dy_row = row + dy;
-                            DrawPixel(col, dy_row, BLACK);
-                            DrawPixel(col + 1, dy_row, BLACK);
-                            DrawPixel(col + 2, dy_row, BLACK);
-                            DrawPixel(col + 3, dy_row, BLACK);    
-                        }
+                    Color pixel_color = display->matrix[i][j] == 1 ? DARKGREEN:BLACK;
+                    uint32_t col = scale_factor*j + (RL_SCREEN_WIDTH / 2) - scale_factor*(CHIP8_SCREEN_WIDTH / 2);
+                    uint32_t row = scale_factor*i;
+                    for(int dy = 0; dy < scale_factor; ++dy){
+                        uint32_t dy_row = row + dy;
+                        DrawPixel(col, dy_row, pixel_color);
+                        DrawPixel(col + 1, dy_row, pixel_color);
+                        DrawPixel(col + 2, dy_row, pixel_color);
+                        DrawPixel(col + 3, dy_row, pixel_color);    
                     }
                 }
             }   
