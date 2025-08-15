@@ -16,7 +16,7 @@ run: all
 	@./build/$(OUTBIN)
 
 debug: all
-	@./build/$(OUTBIN) -c
+	@./build/$(OUTBIN) -d
 
 clean:
 	@rm -rf $(BUILDIR)

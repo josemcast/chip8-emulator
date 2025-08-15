@@ -38,10 +38,7 @@ void set_log_level(log_type_t ll) {
 
 void add_log(log_type_t lt, const char * msg, ...) {
     
-    if (log_enabled != true)
-        return;
-
-    if ((fp == NULL) && (log_to_file == 1))
+    if ((log_enabled != true) || ((fp == NULL) && (log_to_file == 1)))
         return;
 
     va_list args;

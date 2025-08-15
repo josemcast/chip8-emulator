@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
     bool debug_mode = 0;
     if (argc > 1)   {
-        if (TextIsEqual("-c", argv[1]))
+        if (TextIsEqual("-d", argv[1]))
             debug_mode = 1;
     }
 
@@ -41,13 +41,14 @@ int main(int argc, char *argv[]) {
     size_t bytes = fread(buffer, sizeof(uint8_t), BIN_BUFFER_SIZE, fp);
     fclose(fp);
 
+
     //chip8_dump_memory();
 
     if(debug_mode){
         chip8_init(true, CHIP8_LOG_DEBUG, buffer, bytes);
         printf("Result: %d\n", chip8_run());
     }else {
-        chip8_init(true, CHIP8_LOG_DEBUG, buffer, bytes);
+        chip8_init(true, CHIP8_LOG_INFO, buffer, bytes);
         chip8_display_t  *display;
         while(!WindowShouldClose()){
             chip8_step();
@@ -55,13 +56,13 @@ int main(int argc, char *argv[]) {
             
             BeginDrawing();
             ClearBackground(RAYWHITE);
+            const uint8_t scale_factor = 4; //scale 4X: from 64 x 32  to 256 x 128
             for(int i = 0; i<CHIP8_SCREEN_HEIGHT; ++i){
                 for(int j = 0; j < CHIP8_SCREEN_WIDTH; ++j){
                     if(display->matrix[i][j] == 1){ 
-                        //scale 4X: from 64 x 32  to 256 x 128
-                        uint32_t col = 4*j;
-                        uint32_t row = 4*i;
-                        for(int dy = 0; dy < 4; ++dy){
+                        uint32_t col = scale_factor*j + (RL_SCREEN_WIDTH / 2) - scale_factor*(CHIP8_SCREEN_WIDTH / 2);
+                        uint32_t row = scale_factor*i;
+                        for(int dy = 0; dy < scale_factor; ++dy){
                             uint32_t dy_row = row + dy;
                             DrawPixel(col, dy_row, BLACK);
                             DrawPixel(col + 1, dy_row, BLACK);
