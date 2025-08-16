@@ -69,15 +69,13 @@ void chip8_dump_state(){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "PC:%3lX\n", (vm.pc - vm.memory));
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "I:%3X\n", vm.index);
     for (int i = 0; i < VX_COUNT; i++){
-        if(i % 4 == 0)
-            CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "\n");
-        CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "V%1X:%3d ", i, vm.registers[i]);
+        if(i % 4 == 0) CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "\n");
+        CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "V%1X:%3X ", i, vm.registers[i]);
     }
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "\nstack:");
     for(int i = 0; i<STACK_SIZE; i++)
     {
-        if (i % 8 == 0)
-            CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "\n");
+        if (i % 8 == 0) CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "\n");
         CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "%3X ", vm.stack[i]);
     }
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "\n==========================================================\n");
@@ -158,6 +156,57 @@ static void opcode7_handler(uint16_t mi){
     vm.registers[VX_GET(mi)] += IMME_GET(mi);
 }
 
+//Add NN to VX
+static void opcode8_handler(uint16_t mi){
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 8 - %X\n", mi);
+    uint8_t mode = NIBBLE_GET(mi);
+    switch (mode)
+    {
+        case 0x0: // Set VX to value of VY
+            vm.registers[VX_GET(mi)] = vm.registers[VY_GET(mi)];
+            break;
+        case 0x1: // Bitwise OR -> VX = VX | VY
+            vm.registers[VX_GET(mi)] = (vm.registers[VX_GET(mi)] | vm.registers[VY_GET(mi)]);
+            break;
+        case 0x2: // Bitwise AND -> VX = VX & VY
+            vm.registers[VX_GET(mi)] = (vm.registers[VX_GET(mi)] & vm.registers[VY_GET(mi)]);
+            break;
+        case 0x3: // Bitwise XOR -> VX = VX ^ VY
+            vm.registers[VX_GET(mi)] = (vm.registers[VX_GET(mi)] ^ vm.registers[VY_GET(mi)]);
+            break;
+        case 0x4: // VX = VX + VY with carry flag set on VF
+            if (vm.registers[VX_GET(mi)] > (UINT8_MAX - vm.registers[VY_GET(mi)]))
+                vm.registers[CHIP8_VF] = 1;
+            else
+                vm.registers[CHIP8_VF] = 0;
+
+            vm.registers[VX_GET(mi)] = (vm.registers[VX_GET(mi)] + vm.registers[VY_GET(mi)]);
+            break;
+        case 0x5: // VX = VX - VY with VF set to 1 or zero depending on which value is large
+            if (vm.registers[VX_GET(mi)] > vm.registers[VY_GET(mi)])
+                vm.registers[CHIP8_VF] = 1;
+            else
+                vm.registers[CHIP8_VF] = 0;
+
+            vm.registers[VX_GET(mi)] = (vm.registers[VX_GET(mi)] - vm.registers[VY_GET(mi)]);
+            break;
+        case 0x6:
+            // TO DO
+            break;  
+        case 0x7: // VX = VX - VY with VF set to 1 or zero depending on which value is large
+            if (vm.registers[VY_GET(mi)] > vm.registers[VX_GET(mi)])
+                vm.registers[CHIP8_VF] = 1;
+            else
+                vm.registers[CHIP8_VF] = 0;
+
+            vm.registers[VX_GET(mi)] = (vm.registers[VY_GET(mi)] - vm.registers[VX_GET(mi)]);
+            break;
+        default:
+            break;
+    }
+
+}
+
 //Set index to NNN
 static void opcodeA_handler(uint16_t mi){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode A - %X\n", mi);
@@ -191,7 +240,7 @@ void (*process_opcodes[])(uint16_t) = {
     opcode5_handler,
     opcode6_handler,
     opcode7_handler,
-    opcodeN_handler,
+    opcode8_handler,
     opcodeN_handler,
     opcodeA_handler,
     opcodeN_handler,
@@ -203,8 +252,7 @@ void (*process_opcodes[])(uint16_t) = {
 
 int chip8_run() {
 
-    if (!running)
-        return 1;
+    if (!running) {return 1;}
 
     CHIP8_TRACELOG(CHIP8_LOG_INFO, "\nRunning...\n");
 
@@ -223,8 +271,7 @@ int chip8_run() {
 
 void chip8_step() {
 
-    if (!running)
-        return;
+    if (!running) {return;}
 
     uint16_t mi = chip8_fetch();
     uint8_t opcode = OPCODE_GET(mi);

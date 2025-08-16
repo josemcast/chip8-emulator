@@ -10,8 +10,7 @@ static FILE *fp = NULL;
 
 void init_log(bool enable, log_type_t ll) {
     
-    if (fp != NULL)
-        return;
+    if (fp != NULL) {return;}
 
     set_log_level(ll);
     log_enabled = enable;

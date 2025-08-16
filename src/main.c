@@ -35,8 +35,7 @@ int main(int argc, char *argv[]) {
     else    
         fp = fopen("testbin/ibm_logo.ch8", "rb");
     
-    if (fp == NULL)
-        return 1;
+    if (fp == NULL) {return 1;}
     
     size_t bytes = fread(buffer, sizeof(uint8_t), BIN_BUFFER_SIZE, fp);
     fclose(fp);

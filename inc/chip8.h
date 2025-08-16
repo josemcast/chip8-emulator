@@ -41,22 +41,22 @@ typedef enum {
 }opcodes_t;
 
 typedef enum {
-    V0,
-    V1,
-    V2,
-    V3,
-    V4,
-    V5,
-    V6,
-    V7,
-    V8,
-    V9,
-    VA,
-    VB,
-    VC,
-    VD,
-    VE,
-    VF,
+    CHIP8_V0,
+    CHIP8_V1,
+    CHIP8_V2,
+    CHIP8_V3,
+    CHIP8_V4,
+    CHIP8_V5,
+    CHIP8_V6,
+    CHIP8_V7,
+    CHIP8_V8,
+    CHIP8_V9,
+    CHIP8_VA,
+    CHIP8_VB,
+    CHIP8_VC,
+    CHIP8_VD,
+    CHIP8_VE,
+    CHIP8_VF,
     VX_COUNT
 }registers_t;
 
