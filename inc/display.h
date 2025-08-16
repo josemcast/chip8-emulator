@@ -3,16 +3,16 @@
 
 #include <stdint.h>
 
-#define CHIP8_SCREEN_WIDTH    64
-#define CHIP8_SCREEN_HEIGHT   32
+#define CHIP8_DISPLAY_WIDTH    64
+#define CHIP8_DISPLAY_HEIGHT   32
 
 typedef struct{
-    uint8_t matrix[CHIP8_SCREEN_HEIGHT][CHIP8_SCREEN_WIDTH];
+    uint8_t matrix[CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH];
 }chip8_display_t;
 
-void init_screen(void);
-void clear_screen(void);
-uint8_t set_screen(uint8_t, uint8_t, uint8_t);
-chip8_display_t * get_screen(void);
+void init_display(void);
+void clear_display(void);
+uint8_t set_display(uint8_t, uint8_t, uint8_t);
+const chip8_display_t * get_display(void);
 
 #endif //__DISPLAY_H__

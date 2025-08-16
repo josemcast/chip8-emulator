@@ -27,7 +27,7 @@ void chip8_init(bool log_enable, log_type_t lt, uint8_t *bin, size_t size){
     
     running = 1;
 
-    init_screen();       
+    init_display();       
 }
 
 void chip8_load_memory(uint8_t *bin, size_t size){
@@ -108,7 +108,7 @@ static void opcode0_handler(uint16_t mi){
     switch (mode)
     {
         case 0xE0:
-            clear_screen();
+            clear_display();
             break;
         case 0xEE:
             vm.pc = (vm.memory + chip8_stack_pop());
@@ -221,7 +221,7 @@ static void opcodeD_handler(uint16_t mi){
     uint8_t n = NIBBLE_GET(mi);
 
     for(int i = 0; i < n; i++){
-        set_screen(vx, vy+i, (vm.memory[vm.index+i]));
+        set_display(vx, vy+i, (vm.memory[vm.index+i]));
     }
 }
 
