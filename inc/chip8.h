@@ -61,6 +61,13 @@ typedef enum {
 }registers_t;
 
 typedef struct{
+    uint8_t *rom;
+    size_t rom_size;
+    bool log_enable;
+    log_type_t log_type;
+}chip8_config_t;
+
+typedef struct{
     uint8_t memory[MEMORY_SIZE];
     uint16_t stack[STACK_SIZE];
     int sp;                         // stack pointer index, -1 means empty
@@ -70,7 +77,7 @@ typedef struct{
 } chip8_vm_t;
 
 
-void chip8_init(bool, log_type_t, uint8_t *bin, size_t size);
+void chip8_init(chip8_config_t *);
 int chip8_run();
 void chip8_step();
 void chip8_load_fonts(void);

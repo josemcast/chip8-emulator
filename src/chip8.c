@@ -12,14 +12,14 @@
 static chip8_vm_t vm;   
 static bool running = 0;
 
-void chip8_init(bool log_enable, log_type_t lt, uint8_t *bin, size_t size){
+void chip8_init(chip8_config_t *config){
     vm = (chip8_vm_t){0};
     vm.sp = -1;
     
-    init_log(log_enable, lt);
+    init_log(config->log_enable, config->log_type);
 
     chip8_load_fonts();
-    chip8_load_memory(bin, size);
+    chip8_load_memory(config->rom, config->rom_size);
     
     vm.pc = (vm.memory + ROM_INIT);
     memset(vm.registers,0, VX_COUNT);

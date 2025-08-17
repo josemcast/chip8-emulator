@@ -16,14 +16,14 @@
 
 int main(int argc, char *argv[]) {
 
-    bool debug_mode = 0;
+    bool debug_mode = false;
     if (argc > 1)   {
         if (TextIsEqual("-d", argv[1]))
-            debug_mode = 1;
+            debug_mode = true;
     }
 
     if (!debug_mode){
-       InitWindow(RL_SCREEN_WIDTH, RL_SCREEN_HEIGHT, "CHIP8-Emulator");
+       InitWindow(RL_SCREEN_WIDTH, RL_SCREEN_HEIGHT, "CHIP-8 Emulator");
         SetTargetFPS(60);
     }
 
@@ -40,14 +40,18 @@ int main(int argc, char *argv[]) {
     size_t bytes = fread(buffer, sizeof(uint8_t), BIN_BUFFER_SIZE, fp);
     fclose(fp);
 
+    chip8_config_t cfg = {
+        .rom = buffer,
+        .rom_size = bytes,
+        .log_enable = true,
+        .log_type = debug_mode ? CHIP8_LOG_DEBUG:CHIP8_LOG_INFO,
+    };
 
-    //chip8_dump_memory();
+    chip8_init(&cfg);
 
-    if(debug_mode){
-        chip8_init(true, CHIP8_LOG_DEBUG, buffer, bytes);
+    if(debug_mode){    
         printf("Result: %d\n", chip8_run());
     }else {
-        chip8_init(true, CHIP8_LOG_INFO, buffer, bytes);
         while(!WindowShouldClose()){
             chip8_step();
             const chip8_display_t  *display = get_display(); //Get current display state from emulator 

@@ -14,5 +14,6 @@ void init_display(void);
 void clear_display(void);
 uint8_t set_display(uint8_t, uint8_t, uint8_t);
 const chip8_display_t * get_display(void);
+//void show_display(void);
 
 #endif //__DISPLAY_H__

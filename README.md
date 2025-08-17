@@ -1,16 +1,8 @@
-# CHIP8 Emulator
+# CHIP-8 Emulator
 
-CHIP8 Emulator written in C
-
-## Dependecies
-
-For GUI mode:
-
-* [raylib](https://github.com/raysan5/raylib)
+CHIP-8 Emulator written in C
 
 ## Get Started
-
-get source and build
 
 ```bash
 git clone https://github.com/josemcast/chip8-emulator.git
@@ -32,7 +24,7 @@ or
 make run
 ```
 
-will run the emulator and show the IBM logo on the screen.
+will run the emulator and show the IBM logo on the screen ([raylib](https://github.com/raysan5/raylib) needed).
 
 **Debug mode**
 
