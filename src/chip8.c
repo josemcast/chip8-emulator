@@ -213,6 +213,12 @@ static void opcodeA_handler(uint16_t mi){
     vm.index = ADDR_GET(mi);
 }
 
+//Set VX to RAND AND NN
+static void opcodeC_handler(uint16_t mi){
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode C - %X\n", mi);
+    vm.registers[VX_GET(mi)] = RANDI() & IMME_GET(mi);
+}
+
 //Display
 static void opcodeD_handler(uint16_t mi){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode D - %X\n", mi);
@@ -244,7 +250,7 @@ void (*process_opcodes[])(uint16_t) = {
     opcodeN_handler,
     opcodeA_handler,
     opcodeN_handler,
-    opcodeN_handler,
+    opcodeC_handler,
     opcodeD_handler,
     opcodeN_handler,
     opcodeN_handler
