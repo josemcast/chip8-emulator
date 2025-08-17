@@ -4,6 +4,7 @@
 
 #include <chip8.h>
 #include <display.h>
+#include <keyboard.h>
 #include <log.h>
 #include <font.h>
 #include <utilities.h>
@@ -27,7 +28,8 @@ void chip8_init(chip8_config_t *config){
     
     running = 1;
 
-    init_display(config->display_handler);       
+    init_display(config->display_handler);
+    init_keyboard(config->keyboard_handler);       
 }
 
 void chip8_load_memory(uint8_t *bin, size_t size){
@@ -291,6 +293,11 @@ void chip8_step() {
         deinit_log();
         return;
     }
+
+    // if(is_keycode_pressed(CHIP8_KEYCODE_0))
+    // {
+    //     CHIP8_TRACELOG(CHIP8_LOG_INFO, "Keycode 1 pressed\n");
+    // }
 
     process_opcodes[opcode](mi);
     show_display();

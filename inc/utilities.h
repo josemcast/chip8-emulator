@@ -1,5 +1,5 @@
-#ifndef __UTILS_H__
-#define __UTILS_H__
+#ifndef __CHIP8_UTILS_H__
+#define __CHIP8_UTILS_H__
 
 #include <stdlib.h>
 
@@ -9,4 +9,4 @@
 
 #define RANDI()                 (rand() % (UINT8_MAX + 1))
 
-#endif //__UTILS_H__
+#endif //__CHIP8_UTILS_H__

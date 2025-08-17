@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <log.h>
 #include <display.h>
+#include <keyboard.h>
 
 //////////////////// MEMORY LAYOUT AND SIZE //////////////////////////////////////////
 #define ROM_INIT    (0x200)
@@ -68,6 +69,7 @@ typedef struct{
     uint8_t *rom;
     size_t rom_size;
     chip8_display_handler display_handler;
+    chip8_keyboard_handler keyboard_handler;
     bool log_enable;
     chip8_logtype_t log_type;
     const char* log_filename;

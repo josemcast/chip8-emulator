@@ -1,5 +1,5 @@
-#ifndef __FONT_H__
-#define __FONT_H__
+#ifndef __CHIP8_FONT_H__
+#define __CHIP8_FONT_H__
 #include <stdint.h>
 
 uint8_t chip8_fonts[] = {
@@ -21,4 +21,4 @@ uint8_t chip8_fonts[] = {
     0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-#endif // __FONT_H__
+#endif // __CHIP8_FONT_H__

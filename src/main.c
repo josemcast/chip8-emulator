@@ -12,7 +12,32 @@
 #include <raylib.h>
 #include <chip8.h>
 #include <display.h>
+#include <keyboard.h>
 #include <utilities.h>
+
+static KeyboardKey keyboard_map[CHIP8_KEYCODE_COUNT] = {
+    KEY_ONE,
+    KEY_TWO,
+    KEY_THREE,
+    KEY_FOUR,
+    KEY_Q,
+    KEY_W,
+    KEY_E,
+    KEY_R,
+    KEY_A,
+    KEY_S,
+    KEY_D,
+    KEY_F,
+    KEY_Z,
+    KEY_X,
+    KEY_C,
+    KEY_V,
+};
+
+bool keyboard_handler(chip8_keyboard_key_t key)
+{
+    return IsKeyPressed(keyboard_map[key]);
+}
 
 void display_handler(uint8_t disp[CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH])
 {
@@ -64,6 +89,7 @@ int main(int argc, char *argv[]) {
         .rom = buffer,
         .rom_size = bytes,
         .display_handler = display_handler,
+        .keyboard_handler = keyboard_handler,
         .log_enable = true,
         .log_type = debug_mode ? CHIP8_LOG_DEBUG:CHIP8_LOG_INFO,
         .log_filename = NULL,

@@ -1,5 +1,5 @@
-#ifndef __DISPLAY_H__
-#define __DISPLAY_H__
+#ifndef __CHIP8_DISPLAY_H__
+#define __CHIP8_DISPLAY_H__
 
 #include <stdint.h>
 

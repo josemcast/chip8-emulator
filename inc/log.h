@@ -1,5 +1,5 @@
-#ifndef __LOG_H__
-#define __LOG_H__
+#ifndef __CHIP8_LOG_H__
+#define __CHIP8_LOG_H__
 
 #include <stdio.h>
 
@@ -20,4 +20,4 @@ extern void add_log(chip8_logtype_t
 
 #define CHIP8_TRACELOG(type, msg, ...)       add_log(type, msg, ##__VA_ARGS__);
 
-#endif //__LOG_H__
+#endif //__CHIP8_LOG_H__
