@@ -190,8 +190,9 @@ static void opcode8_handler(uint16_t mi){
 
             vm.registers[VX_GET(mi)] = (vm.registers[VX_GET(mi)] - vm.registers[VY_GET(mi)]);
             break;
-        case 0x6:
-            // TO DO
+        case 0x6: // VX = (VY >> 1) with VF set to bit shifted out
+            vm.registers[CHIP8_VF] = vm.registers[VY_GET(mi)] & 0x1;
+            vm.registers[VX_GET(mi)] = (vm.registers[VY_GET(mi)] >> 1);
             break;  
         case 0x7: // VX = VX - VY with VF set to 1 or zero depending on which value is large
             if (vm.registers[VY_GET(mi)] > vm.registers[VX_GET(mi)])
@@ -201,6 +202,10 @@ static void opcode8_handler(uint16_t mi){
 
             vm.registers[VX_GET(mi)] = (vm.registers[VY_GET(mi)] - vm.registers[VX_GET(mi)]);
             break;
+        case 0xE: // VX = (VY << 1) with VF set to bit shifted out
+            vm.registers[CHIP8_VF] = (vm.registers[VY_GET(mi)] >> 7) & 0x1;
+            vm.registers[VX_GET(mi)] = (vm.registers[VY_GET(mi)] << 1);
+            break;  
         default:
             break;
     }
