@@ -3,42 +3,13 @@
 
 #include <stdint.h>
 #include <log.h>
+#include <display.h>
 
+//////////////////// MEMORY LAYOUT AND SIZE //////////////////////////////////////////
 #define ROM_INIT    (0x200)
 #define FONTS_INIT  (0x050)
 #define MEMORY_SIZE (1 << 12)
 #define STACK_SIZE  (24)
-
-#define OPCODE_SIZE         (4)
-#define OPCODE_SHIFT        (12)
-#define OPCODE_MASK         ((1 << OPCODE_SIZE) -1)
-#define OPCODE_GET(opcode)  ((opcode >> OPCODE_SHIFT) & OPCODE_MASK)
-
-#define VX_SIZE             (4)
-#define VX_SHIFT            (8)
-#define VX_MASK             ((1 << VX_SIZE) -1)
-#define VX_GET(mi)          ((mi >> VX_SHIFT) & VX_MASK)
-#define VY_SIZE             VX_SIZE
-#define VY_SHIFT            (4)
-#define VY_MASK             ((1 << VY_SIZE) -1)
-#define VY_GET(mi)          ((mi >> VY_SHIFT) & VY_MASK)
-
-
-#define ADDR_GET(mi)        ((mi & 0xFFF))
-#define IMME_GET(mi)        ((mi & 0xFF))
-#define NIBBLE_GET(mi)      ((mi & 0xF))
-
-typedef enum {
-    CHIP8_OPCODE_0,
-    CHIP8_OPCODE_1,
-    CHIP8_OPCODE_2,
-    CHIP8_OPCODE_3,
-    CHIP8_OPCODE_4,
-    CHIP8_OPCODE_5,
-    CHIP8_OPCODE_6,
-    CHIP8_OPCODE_7,
-    CHIP8_OPCODE_COUNT
-}opcodes_t;
 
 typedef enum {
     CHIP8_V0,
@@ -60,11 +31,46 @@ typedef enum {
     VX_COUNT
 }registers_t;
 
+
+//////////////////// OPCODE UTILS ////////////////////////////////////////////////////
+#define OPCODE_SIZE         (4)
+#define OPCODE_SHIFT        (12)
+#define OPCODE_MASK         ((1 << OPCODE_SIZE) -1)
+#define OPCODE_GET(opcode)  ((opcode >> OPCODE_SHIFT) & OPCODE_MASK)
+
+#define VX_SIZE             (4)
+#define VX_SHIFT            (8)
+#define VX_MASK             ((1 << VX_SIZE) -1)
+#define VX_GET(mi)          ((mi >> VX_SHIFT) & VX_MASK)
+#define VY_SIZE             VX_SIZE
+#define VY_SHIFT            (4)
+#define VY_MASK             ((1 << VY_SIZE) -1)
+#define VY_GET(mi)          ((mi >> VY_SHIFT) & VY_MASK)
+
+#define ADDR_GET(mi)        ((mi & 0xFFF))
+#define IMME_GET(mi)        ((mi & 0xFF))
+#define NIBBLE_GET(mi)      ((mi & 0xF))
+
+typedef enum {
+    CHIP8_OPCODE_0,
+    CHIP8_OPCODE_1,
+    CHIP8_OPCODE_2,
+    CHIP8_OPCODE_3,
+    CHIP8_OPCODE_4,
+    CHIP8_OPCODE_5,
+    CHIP8_OPCODE_6,
+    CHIP8_OPCODE_7,
+    CHIP8_OPCODE_COUNT
+}opcodes_t;
+
+//////////////////// CHIP-8 VM definition ////////////////////////////////////////////
 typedef struct{
     uint8_t *rom;
     size_t rom_size;
+    chip8_display_handler display_handler;
     bool log_enable;
-    log_type_t log_type;
+    chip8_logtype_t log_type;
+    const char* log_filename;
 }chip8_config_t;
 
 typedef struct{
@@ -77,6 +83,7 @@ typedef struct{
 } chip8_vm_t;
 
 
+//////////////////// API /////////////////////////////////////////////////////////////
 void chip8_init(chip8_config_t *);
 int chip8_run();
 void chip8_step();

@@ -3,18 +3,20 @@
 
 #include <display.h>
 
-static chip8_display_t display;
+static uint8_t matrix[CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH];
+static chip8_display_handler internal_handler;
 
-void init_display(void){
-    for(int i = 0; i < CHIP8_DISPLAY_HEIGHT; ++i){
-        for(int j = 0; j < CHIP8_DISPLAY_WIDTH; ++j){
-            display.matrix[i][j] = 0;
-        }
-    }
+void init_display(chip8_display_handler handler){
+    internal_handler = handler;
+    clear_display();
 }
 
 void clear_display(void){
-    init_display();
+    for(int i = 0; i < CHIP8_DISPLAY_HEIGHT; ++i){
+        for(int j = 0; j < CHIP8_DISPLAY_WIDTH; ++j){
+            matrix[i][j] = 0;
+        }
+    }
 }
 
 uint8_t set_display(uint8_t vx, uint8_t vy, uint8_t byte){
@@ -25,11 +27,11 @@ uint8_t set_display(uint8_t vx, uint8_t vy, uint8_t byte){
     for(int i = 7; ((i >= 0) && (vx < CHIP8_DISPLAY_WIDTH)); --i)
     {
         if((byte >> i) & 0x1){
-            if(display.matrix[vy][vx] == 1){
-                display.matrix[vy][vx] = 0;
+            if(matrix[vy][vx] == 1){
+                matrix[vy][vx] = 0;
                 collision = 1;
             }else {
-                display.matrix[vy][vx] = 1;
+                matrix[vy][vx] = 1;
             }
         }
         vx++;
@@ -38,7 +40,6 @@ uint8_t set_display(uint8_t vx, uint8_t vy, uint8_t byte){
     return collision;
 }
 
-const chip8_display_t *get_display(void)
-{
-    return &display;
+void show_display(){
+    internal_handler(matrix);
 }

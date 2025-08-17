@@ -16,7 +16,7 @@ void chip8_init(chip8_config_t *config){
     vm = (chip8_vm_t){0};
     vm.sp = -1;
     
-    init_log(config->log_enable, config->log_type);
+    init_log(config->log_enable, config->log_type, config->log_filename);
 
     chip8_load_fonts();
     chip8_load_memory(config->rom, config->rom_size);
@@ -27,7 +27,7 @@ void chip8_init(chip8_config_t *config){
     
     running = 1;
 
-    init_display();       
+    init_display(config->display_handler);       
 }
 
 void chip8_load_memory(uint8_t *bin, size_t size){
@@ -282,4 +282,5 @@ void chip8_step() {
     }
 
     process_opcodes[opcode](mi);
+    show_display();
 }

@@ -3,20 +3,22 @@
 #include <log.h>
 
 
-static log_type_t current_log_level = CHIP8_LOG_INFO;
+static chip8_logtype_t current_log_level = CHIP8_LOG_INFO;
 static bool log_enabled = 0;
 static char log_to_file = 0;
 static FILE *fp = NULL;
 
-void init_log(bool enable, log_type_t ll) {
+void init_log(bool enable, chip8_logtype_t ll, const char* filename) {
     
     if (fp != NULL) {return;}
 
     set_log_level(ll);
     log_enabled = enable;
     if(log_enabled){
-        if (log_to_file)
-            fp = fopen("chip8_run.log", "w");
+        if (filename != NULL){
+            fp = fopen(filename, "w");
+            log_to_file = 1;
+        }
     
         if (NULL == fp){
             //perror("Could not open file for logging...fallbacking to stdout");
@@ -31,11 +33,11 @@ void deinit_log() {
         fclose(fp);
 }
 
-void set_log_level(log_type_t ll) {
+void set_log_level(chip8_logtype_t ll) {
     current_log_level = ll;
 }
 
-void add_log(log_type_t lt, const char * msg, ...) {
+void add_log(chip8_logtype_t lt, const char * msg, ...) {
     
     if ((log_enabled != true) || ((fp == NULL) && (log_to_file == 1)))
         return;

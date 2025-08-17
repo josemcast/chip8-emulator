@@ -6,14 +6,12 @@
 #define CHIP8_DISPLAY_WIDTH    64
 #define CHIP8_DISPLAY_HEIGHT   32
 
-typedef struct{
-    uint8_t matrix[CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH];
-}chip8_display_t;
+//Callback to graphics library used by show_display()
+typedef void (*chip8_display_handler)(uint8_t [CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH]);
 
-void init_display(void);
+void init_display(chip8_display_handler);
 void clear_display(void);
 uint8_t set_display(uint8_t, uint8_t, uint8_t);
-const chip8_display_t * get_display(void);
-//void show_display(void);
+void show_display(void);
 
 #endif //__DISPLAY_H__
