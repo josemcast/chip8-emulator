@@ -67,10 +67,8 @@ int main(int argc, char *argv[]) {
             debug_mode = true;
     }
 
-    if (!debug_mode){
-       InitWindow(RL_SCREEN_WIDTH, RL_SCREEN_HEIGHT, "CHIP-8 Emulator");
-        SetTargetFPS(60);
-    }
+    InitWindow(RL_SCREEN_WIDTH, RL_SCREEN_HEIGHT, "CHIP-8 Emulator");
+    SetTargetFPS(60);
 
     //Load binary from testbin folder - default IMB logo
     uint8_t buffer[BIN_BUFFER_SIZE];
@@ -90,6 +88,7 @@ int main(int argc, char *argv[]) {
         .rom_size = bytes,
         .display_handler = display_handler,
         .keyboard_handler = keyboard_handler,
+        .keyboard_poll = PollInputEvents,
         .log_enable = true,
         .log_type = debug_mode ? CHIP8_LOG_DEBUG:CHIP8_LOG_INFO,
         .log_filename = NULL,
@@ -97,15 +96,11 @@ int main(int argc, char *argv[]) {
 
     chip8_init(&cfg);
 
-    if(debug_mode){    
-        printf("Result: %d\n", chip8_run());
-    }else {
-        while(!WindowShouldClose()){
-            //const chip8_display_t  *display = get_display(); //Get current display state from emulator 
-            BeginDrawing();
-               chip8_step();
-            EndDrawing();
-        }
+    while(!WindowShouldClose()){
+        //const chip8_display_t  *display = get_display(); //Get current display state from emulator 
+        BeginDrawing();
+            chip8_step();
+        EndDrawing();
     }
     return 0;
 }

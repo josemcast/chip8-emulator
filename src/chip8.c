@@ -29,7 +29,7 @@ void chip8_init(chip8_config_t *config){
     running = 1;
 
     init_display(config->display_handler);
-    init_keyboard(config->keyboard_handler);       
+    init_keyboard(config->keyboard_handler, config->keyboard_poll);       
 }
 
 void chip8_load_memory(uint8_t *bin, size_t size){
@@ -238,6 +238,89 @@ static void opcodeD_handler(uint16_t mi){
     }
 }
 
+//xF opcodes
+static void opcodeF_handler(uint16_t mi){
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode F - %X\n", mi);
+    uint8_t mode = IMME_GET(mi);
+    switch (mode)
+    {
+        case 0x0A: // wait for key
+            while(1){
+                poll_keyboard();
+                if(is_keycode_pressed(CHIP8_KEYCODE_0)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_0;
+                    break;        
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_1)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_1;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_2)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_2;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_3)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_3;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_4)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_4;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_5)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_5;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_6)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_6;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_7)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_7;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_8)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_8;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_9)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_9;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_A)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_A;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_B)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_B;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_C)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_C;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_D)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_D;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_E)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_E;
+                    break;
+                }
+                if(is_keycode_pressed(CHIP8_KEYCODE_F)){
+                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_F;
+                    break;
+                }
+            }
+            break;
+        case 0xFF:
+            exit(0);
+            break;
+        default:
+            break;
+    }
+}
+
 //placeholder for future opcode handlers
 static void opcodeN_handler(uint16_t mi)
 {
@@ -260,7 +343,7 @@ void (*process_opcodes[])(uint16_t) = {
     opcodeC_handler,
     opcodeD_handler,
     opcodeN_handler,
-    opcodeN_handler
+    opcodeF_handler
 };
 
 int chip8_run() {
@@ -273,7 +356,7 @@ int chip8_run() {
         uint16_t mi = chip8_fetch();
         uint8_t opcode = OPCODE_GET(mi);
 
-        if ((opcode >= 0x0F)){
+        if ((opcode >= 0x10)){
             deinit_log();
             return 1;
         }
@@ -289,16 +372,12 @@ void chip8_step() {
     uint16_t mi = chip8_fetch();
     uint8_t opcode = OPCODE_GET(mi);
 
-    if ((opcode >= 0x0F)){
+    if ((opcode >= 0xFE)){
         deinit_log();
         return;
     }
 
-    // if(is_keycode_pressed(CHIP8_KEYCODE_0))
-    // {
-    //     CHIP8_TRACELOG(CHIP8_LOG_INFO, "Keycode 1 pressed\n");
-    // }
-
     process_opcodes[opcode](mi);
+    chip8_dump_state();
     show_display();
 }
