@@ -13,6 +13,7 @@
 static chip8_vm_t vm;   
 static bool running = 0;
 
+////////////////////////// Initialization functions /////////////////////////////////////////////////
 void chip8_init(chip8_config_t *config){
     vm = (chip8_vm_t){0};
     vm.sp = -1;
@@ -54,6 +55,7 @@ void chip8_load_fonts(){
     }
 }
 
+////////////////////////// Debug functions //////////////////////////////////////////////////////////
 void chip8_dump_memory(){
     FILE *fp = fopen("chip8_memdump.bin", "wb");
     if(fp == NULL){
@@ -83,6 +85,7 @@ void chip8_dump_state(){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "\n==========================================================\n");
 }
 
+////////////////////////// CPU functions ////////////////////////////////////////////////////////////
 static uint16_t chip8_fetch(){
     uint16_t op = (uint16_t)*(vm.pc++); 
     return (op << 8) | *(vm.pc++);
@@ -134,12 +137,17 @@ static void opcode2_handler(uint16_t mi){
     vm.pc = (vm.memory + ADDR_GET(mi));
 }
 
+//Skip next instruction if VX == NN
 static void opcode3_handler(uint16_t mi){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 3 - %X\n", mi);
+    if(vm.registers[VX_GET(mi)] == IMME_GET(mi))
+        vm.pc += 2;
 }
 
 static void opcode4_handler(uint16_t mi){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 4 - %X\n", mi);
+    if(vm.registers[VX_GET(mi)] != IMME_GET(mi))
+        vm.pc += 2;
 }
 
 static void opcode5_handler(uint16_t mi){

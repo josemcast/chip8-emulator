@@ -48,6 +48,8 @@ will run the emulator with custom debug.ch8 file and print to stdout
 | 00EE       | Return              |
 | 1NNN       | goto                |
 | 2NNN       | Call                |
+| 3XNN       | Conditional         |
+| 4XNN       | Conditional         |
 | 6XNN       | Set Immediate       |
 | 7XNN       | Add Immediate       |
 | 8XY0       | Set                 |
@@ -56,4 +58,8 @@ will run the emulator with custom debug.ch8 file and print to stdout
 | 8XY3       | Bitwise XOR         |
 | 8YX4       | Add with Carry Flag |
 | 8XY5       | Subtract with Flag  |
+| 8XY6       | Shift right         |
 | 8XY7       | Subtract with Flag  |
+| 8XYE       | Shift left          |
+| CXNN       | Random              |
+| FX0A       | Get Key             |
