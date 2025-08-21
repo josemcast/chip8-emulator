@@ -13,13 +13,14 @@ ifdef GENERATE_COV
 CFLAGS += --coverage
 LDFLAGS += --coverage
 endif
+
 all: $(OBJ)
 	@$(CC) -o $(BUILDIR)/$(OUTBIN) $^ $(LDFLAGS)
 	@objdump -d -M intel $(BUILDIR)/$(OUTBIN) > $(BUILDIR)/"$(OUTBIN).dis"
 
 $(BUILDIR)/%.o: $(SRCDIR)/%.c
 	@mkdir -p $(BUILDIR)
-	$(CC) -c -o $@ $^ $(CFLAGS)
+	@$(CC) -c -o $@ $^ $(CFLAGS)
 
 run: all
 	@./build/$(OUTBIN)
