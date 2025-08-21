@@ -63,5 +63,8 @@ will run the emulator with custom debug.ch8 file and print to stdout
 | 8XY7       | Subtract with Flag  |
 | 8XYE       | Shift left          |
 | 9XY0       | Conditional         |
+| 9XY0       | Conditional         |
+| ANNN       | Set Index           |
+| BNNN       | Jump + offset       |
 | CXNN       | Random              |
 | FX0A       | Get Key             |
