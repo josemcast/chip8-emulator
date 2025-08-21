@@ -50,6 +50,7 @@ will run the emulator with custom debug.ch8 file and print to stdout
 | 2NNN       | Call                |
 | 3XNN       | Conditional         |
 | 4XNN       | Conditional         |
+| 5XY0       | Conditional         |
 | 6XNN       | Set Immediate       |
 | 7XNN       | Add Immediate       |
 | 8XY0       | Set                 |
@@ -61,5 +62,6 @@ will run the emulator with custom debug.ch8 file and print to stdout
 | 8XY6       | Shift right         |
 | 8XY7       | Subtract with Flag  |
 | 8XYE       | Shift left          |
+| 9XY0       | Conditional         |
 | CXNN       | Random              |
 | FX0A       | Get Key             |

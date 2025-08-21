@@ -144,14 +144,18 @@ static void opcode3_handler(uint16_t mi){
         vm.pc += 2;
 }
 
+//Skip next instruction if VX != NN
 static void opcode4_handler(uint16_t mi){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 4 - %X\n", mi);
     if(vm.registers[VX_GET(mi)] != IMME_GET(mi))
         vm.pc += 2;
 }
 
+//Skip next instruction if VX == VY
 static void opcode5_handler(uint16_t mi){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 5 - %X\n", mi);
+    if(vm.registers[VX_GET(mi)] == vm.registers[VY_GET(mi)])
+        vm.pc += 2;
 }
 
 //set VX to NN
@@ -222,10 +226,11 @@ static void opcode8_handler(uint16_t mi){
 
 }
 
-//Set index to NNN
+//Skip next instruction if VX != VY
 static void opcode9_handler(uint16_t mi){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 9 - %X\n", mi);
-    vm.index = ADDR_GET(mi);
+    if(vm.registers[VX_GET(mi)] != vm.registers[VY_GET(mi)])
+        vm.pc += 2;
 }
 
 //Set index to NNN
