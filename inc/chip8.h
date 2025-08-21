@@ -52,18 +52,6 @@ typedef enum {
 #define IMME_GET(mi)        ((mi & 0xFF))
 #define NIBBLE_GET(mi)      ((mi & 0xF))
 
-typedef enum {
-    CHIP8_OPCODE_0,
-    CHIP8_OPCODE_1,
-    CHIP8_OPCODE_2,
-    CHIP8_OPCODE_3,
-    CHIP8_OPCODE_4,
-    CHIP8_OPCODE_5,
-    CHIP8_OPCODE_6,
-    CHIP8_OPCODE_7,
-    CHIP8_OPCODE_COUNT
-}opcodes_t;
-
 //////////////////// CHIP-8 VM definition ////////////////////////////////////////////
 typedef struct{
     uint8_t *rom;
@@ -88,7 +76,6 @@ typedef struct{
 
 //////////////////// API /////////////////////////////////////////////////////////////
 void chip8_init(chip8_config_t *);
-int chip8_run();
 void chip8_step();
 void chip8_load_fonts(void);
 void chip8_load_memory(uint8_t *,size_t);

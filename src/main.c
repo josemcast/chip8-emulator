@@ -97,7 +97,6 @@ int main(int argc, char *argv[]) {
     chip8_init(&cfg);
 
     while(!WindowShouldClose()){
-        //const chip8_display_t  *display = get_display(); //Get current display state from emulator 
         BeginDrawing();
             chip8_step();
         EndDrawing();

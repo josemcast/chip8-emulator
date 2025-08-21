@@ -223,6 +223,12 @@ static void opcode8_handler(uint16_t mi){
 }
 
 //Set index to NNN
+static void opcode9_handler(uint16_t mi){
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode 9 - %X\n", mi);
+    vm.index = ADDR_GET(mi);
+}
+
+//Set index to NNN
 static void opcodeA_handler(uint16_t mi){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode A - %X\n", mi);
     vm.index = ADDR_GET(mi);
@@ -240,9 +246,10 @@ static void opcodeD_handler(uint16_t mi){
     uint8_t vx = vm.registers[VX_GET(mi)];
     uint8_t vy = vm.registers[VY_GET(mi)];
     uint8_t n = NIBBLE_GET(mi);
-
+    uint8_t collision = 0;
     for(int i = 0; i < n; i++){
-        set_display(vx, vy+i, (vm.memory[vm.index+i]));
+        collision = set_display(vx, vy+i, (vm.memory[vm.index+i]));
+        vm.registers[CHIP8_VF] = collision;
     }
 }
 
@@ -345,7 +352,7 @@ void (*process_opcodes[])(uint16_t) = {
     opcode6_handler,
     opcode7_handler,
     opcode8_handler,
-    opcodeN_handler,
+    opcode9_handler,
     opcodeA_handler,
     opcodeN_handler,
     opcodeC_handler,
@@ -353,25 +360,6 @@ void (*process_opcodes[])(uint16_t) = {
     opcodeN_handler,
     opcodeF_handler
 };
-
-int chip8_run() {
-
-    if (!running) {return 1;}
-
-    CHIP8_TRACELOG(CHIP8_LOG_INFO, "\nRunning...\n");
-
-    while(1){
-        uint16_t mi = chip8_fetch();
-        uint8_t opcode = OPCODE_GET(mi);
-
-        if ((opcode >= 0x10)){
-            deinit_log();
-            return 1;
-        }
-        process_opcodes[opcode](mi);
-        chip8_dump_state();
-    }
-}
 
 void chip8_step() {
 

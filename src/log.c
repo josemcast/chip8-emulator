@@ -57,6 +57,5 @@ void add_log(chip8_logtype_t lt, const char * msg, ...) {
         if (lt <= current_log_level)
             vprintf(msg, args);
     }
-
     va_end(args);
 }
