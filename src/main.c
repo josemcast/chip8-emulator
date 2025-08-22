@@ -119,6 +119,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     };
 
     chip8_init(&cfg);
+    // if(debug_mode)
+    //     chip8_dump_memory();
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }

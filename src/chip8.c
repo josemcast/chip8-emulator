@@ -264,7 +264,7 @@ static void opcodeD_handler(uint16_t mi){
     }
 }
 
-//Display
+//Skip if key
 static void opcodeE_handler(uint16_t mi){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode E - %X\n", mi);
     uint8_t mode = IMME_GET(mi);
@@ -360,6 +360,10 @@ static void opcodeF_handler(uint16_t mi){
                     break;
                 }
             }
+            break;
+        case 0x29:
+            uint8_t key = vm.registers[VX_GET(mi)] & 0xF;
+            vm.index = FONTS_INIT + key * FONT_HEIGHT;
             break;
         case 0xFF:
             exit(0);
