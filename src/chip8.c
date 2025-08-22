@@ -264,6 +264,28 @@ static void opcodeD_handler(uint16_t mi){
     }
 }
 
+//Display
+static void opcodeE_handler(uint16_t mi){
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode E - %X\n", mi);
+    uint8_t mode = IMME_GET(mi);
+    switch (mode)
+    {
+        case 0x9E: //skip if key in VX is pressed
+            poll_keyboard();
+            printf("aqui\n");
+            if(is_keycode_pressed(vm.registers[VX_GET(mi)]))
+                vm.pc += 2;
+            break;
+        case 0xA1: //skip if key in VX is NOT pressed
+            poll_keyboard();
+            if(!is_keycode_pressed(vm.registers[VX_GET(mi)]))
+                vm.pc += 2;
+            break;
+        default:
+            break;
+    }
+}
+
 //xF opcodes
 static void opcodeF_handler(uint16_t mi){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode F - %X\n", mi);
@@ -347,12 +369,6 @@ static void opcodeF_handler(uint16_t mi){
     }
 }
 
-//placeholder for future opcode handlers
-static void opcodeN_handler(uint16_t mi)
-{
-    //TO DO
-}
-
 void (*process_opcodes[])(uint16_t) = {
     opcode0_handler,
     opcode1_handler,
@@ -368,7 +384,7 @@ void (*process_opcodes[])(uint16_t) = {
     opcodeB_handler,
     opcodeC_handler,
     opcodeD_handler,
-    opcodeN_handler,
+    opcodeE_handler,
     opcodeF_handler
 };
 

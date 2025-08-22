@@ -56,4 +56,6 @@ will run the emulator with custom debug.ch8 file and print to stdout
 | ANNN       | Set Index           |
 | BNNN       | Jump + offset       |
 | CXNN       | Random              |
+| EX9E       | Skip if Key         |
+| EXA1       | Skip if not Key     |
 | FX0A       | Get Key             |

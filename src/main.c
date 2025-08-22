@@ -7,7 +7,6 @@
 
 #define BIN_BUFFER_SIZE         256
 
-//#include "raylib.h"
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -18,7 +17,6 @@
 #include <utilities.h>
 
 
-/* We will use this renderer to draw into this window every frame. */
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 
@@ -53,7 +51,7 @@ void display_handler(uint8_t disp[CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH])
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);  /* black, full alpha */
     SDL_RenderClear(renderer);  /* start with a blank canvas. */
-    SDL_SetRenderDrawColor(renderer, 0, 117, 44, SDL_ALPHA_OPAQUE);  /* white, full alpha */
+    SDL_SetRenderDrawColor(renderer, 0, 117, 44, SDL_ALPHA_OPAQUE);
     
     const uint8_t scale_factor = 4; //scale 4X: from 64 x 32  to 256 x 128
     for(int i = 0; i<CHIP8_DISPLAY_HEIGHT; ++i){
@@ -114,7 +112,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         .rom_size = bytes,
         .display_handler = display_handler,
         .keyboard_handler = keyboard_handler,
-        .keyboard_poll = SDL_PumpEvents,
+        .keyboard_poll = SDL_PumpEvents, //we need a handler to update input before polling for keyboard presses
         .log_enable = true,
         .log_type = debug_mode ? CHIP8_LOG_DEBUG:CHIP8_LOG_INFO,
         .log_filename = NULL,
