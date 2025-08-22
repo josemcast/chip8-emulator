@@ -22,6 +22,7 @@
 *.a
 *.la
 *.lo
+raylib
 
 # Shared objects (inc. Windows DLLs)
 *.dll

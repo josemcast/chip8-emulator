@@ -9,7 +9,7 @@
 #define RL_SCREEN_HEIGHT        128
 #define RL_SCREEN_WIDTH         256
 
-#include <raylib.h>
+#include "raylib.h"
 #include <chip8.h>
 #include <display.h>
 #include <keyboard.h>
