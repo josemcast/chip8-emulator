@@ -7,7 +7,8 @@ CHIP-8 Emulator written in C
 ```bash
 git clone https://github.com/josemcast/chip8-emulator.git
 cd chip8-emulator
-make
+cmake -S . -B build
+cmake --build build -j
 ```
 
 ## How to run
@@ -18,24 +19,12 @@ make
 ./build/chip8
 ```
 
-or
-
-```bash
-make run
-```
-
-will run the emulator and show the IBM logo on the screen ([raylib](https://github.com/raysan5/raylib) needed).
+will run the emulator and show the IBM logo on the screen ([SDL3](https://github.com/libsdl-org/SDL) needed).
 
 **Debug mode**
 
 ```bash
 ./build/chip8 -d
-```
-
-or
-
-```bash
-make debug
 ```
 
 will run the emulator with custom debug.ch8 file and print to stdout

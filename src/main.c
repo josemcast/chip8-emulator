@@ -1,74 +1,100 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include <log.h>
 
 #define BIN_BUFFER_SIZE         256
 
-#define RL_SCREEN_HEIGHT        128
-#define RL_SCREEN_WIDTH         256
+//#include "raylib.h"
+#define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 
-#include "raylib.h"
 #include <chip8.h>
 #include <display.h>
 #include <keyboard.h>
 #include <utilities.h>
 
-static KeyboardKey keyboard_map[CHIP8_KEYCODE_COUNT] = {
-    KEY_ONE,
-    KEY_TWO,
-    KEY_THREE,
-    KEY_FOUR,
-    KEY_Q,
-    KEY_W,
-    KEY_E,
-    KEY_R,
-    KEY_A,
-    KEY_S,
-    KEY_D,
-    KEY_F,
-    KEY_Z,
-    KEY_X,
-    KEY_C,
-    KEY_V,
+
+/* We will use this renderer to draw into this window every frame. */
+static SDL_Window *window = NULL;
+static SDL_Renderer *renderer = NULL;
+
+#define WINDOW_WIDTH 256
+#define WINDOW_HEIGHT 128
+
+static SDL_Scancode keyboard_map[CHIP8_KEYCODE_COUNT] = {
+    SDL_SCANCODE_1,
+    SDL_SCANCODE_2,
+    SDL_SCANCODE_3,
+    SDL_SCANCODE_4,
+    SDL_SCANCODE_Q,
+    SDL_SCANCODE_W,
+    SDL_SCANCODE_E,
+    SDL_SCANCODE_R,
+    SDL_SCANCODE_A,
+    SDL_SCANCODE_S,
+    SDL_SCANCODE_D,
+    SDL_SCANCODE_F,
+    SDL_SCANCODE_Z,
+    SDL_SCANCODE_X,
+    SDL_SCANCODE_C,
+    SDL_SCANCODE_V,
 };
 
 bool keyboard_handler(chip8_keyboard_key_t key)
 {
-    return IsKeyPressed(keyboard_map[key]);
+    return SDL_GetKeyboardState(NULL)[keyboard_map[key]];
 }
 
 void display_handler(uint8_t disp[CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH])
 {
-    ClearBackground(RAYWHITE);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);  /* black, full alpha */
+    SDL_RenderClear(renderer);  /* start with a blank canvas. */
+    SDL_SetRenderDrawColor(renderer, 0, 117, 44, SDL_ALPHA_OPAQUE);  /* white, full alpha */
+    
     const uint8_t scale_factor = 4; //scale 4X: from 64 x 32  to 256 x 128
     for(int i = 0; i<CHIP8_DISPLAY_HEIGHT; ++i){
         for(int j = 0; j < CHIP8_DISPLAY_WIDTH; ++j){
-            Color pixel_color = disp[i][j] == 1 ? DARKGREEN:BLACK;
-            uint32_t col = scale_factor*j + (RL_SCREEN_WIDTH / 2) - scale_factor*(CHIP8_DISPLAY_WIDTH / 2);
-            uint32_t row = scale_factor*i;
+            if (disp[i][j] == 0)
+                continue;
+            float col = scale_factor*j + (WINDOW_WIDTH / 2) - scale_factor*(CHIP8_DISPLAY_WIDTH / 2);
+            float row = scale_factor*i;
             for(int dy = 0; dy < scale_factor; ++dy){
                 uint32_t dy_row = row + dy;
-                DrawPixel(col, dy_row, pixel_color);
-                DrawPixel(col + 1, dy_row, pixel_color);
-                DrawPixel(col + 2, dy_row, pixel_color);
-                DrawPixel(col + 3, dy_row, pixel_color);    
+                SDL_RenderPoint(renderer, col, dy_row);
+                SDL_RenderPoint(renderer, col + 1, dy_row);
+                SDL_RenderPoint(renderer, col + 2, dy_row);
+                SDL_RenderPoint(renderer, col + 3, dy_row);
             }
         }
     }
+
+    SDL_RenderPresent(renderer);
 }
 
-int main(int argc, char *argv[]) {
-
+/* This function runs once at startup. */
+SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
+{
     bool debug_mode = false;
     if (argc > 1)   {
-        if (TextIsEqual("-d", argv[1]))
+        if (strcmp("-d", argv[1]) == 0)
             debug_mode = true;
     }
 
-    InitWindow(RL_SCREEN_WIDTH, RL_SCREEN_HEIGHT, "CHIP-8 Emulator");
-    SetTargetFPS(60);
+    SDL_SetAppMetadata("CHIP-8 Emulator", "1.0", "Emulator");
+
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
+    if (!SDL_CreateWindowAndRenderer("chip8", WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer)) {
+        SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
 
     //Load binary from testbin folder - default IMB logo
     uint8_t buffer[BIN_BUFFER_SIZE];
@@ -88,7 +114,7 @@ int main(int argc, char *argv[]) {
         .rom_size = bytes,
         .display_handler = display_handler,
         .keyboard_handler = keyboard_handler,
-        .keyboard_poll = PollInputEvents,
+        .keyboard_poll = SDL_PumpEvents,
         .log_enable = true,
         .log_type = debug_mode ? CHIP8_LOG_DEBUG:CHIP8_LOG_INFO,
         .log_filename = NULL,
@@ -96,10 +122,30 @@ int main(int argc, char *argv[]) {
 
     chip8_init(&cfg);
 
-    while(!WindowShouldClose()){
-        BeginDrawing();
-            chip8_step();
-        EndDrawing();
+    return SDL_APP_CONTINUE;  /* carry on with the program! */
+}
+
+/* This function runs when a new event (mouse input, keypresses, etc) occurs. */
+SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
+{
+    if (event->type == SDL_EVENT_QUIT) {
+        return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
     }
-    return 0;
+    return SDL_APP_CONTINUE;  /* carry on with the program! */
+}
+
+/* This function runs once per frame, and is the heart of the program. */
+SDL_AppResult SDL_AppIterate(void *appstate)
+{
+    /* let's move all our points a little for a new frame. */
+    /* as you can see from this, rendering draws over whatever was drawn before it. */
+    chip8_step();
+    
+    return SDL_APP_CONTINUE;  /* carry on with the program! */
+}
+
+/* This function runs once at shutdown. */
+void SDL_AppQuit(void *appstate, SDL_AppResult result)
+{
+    /* SDL will clean up the window/renderer for us. */
 }

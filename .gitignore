@@ -23,6 +23,7 @@
 *.la
 *.lo
 raylib
+SDL
 
 # Shared objects (inc. Windows DLLs)
 *.dll
