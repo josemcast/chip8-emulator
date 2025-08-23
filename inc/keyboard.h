@@ -2,6 +2,7 @@
 #define __CHIP8_KEYBOARD_H__
 
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef enum {
     CHIP8_KEYCODE_0,
@@ -33,5 +34,6 @@ typedef void (*chip8_keyboard_poll)(void);
 
 void init_keyboard(chip8_keyboard_handler, chip8_keyboard_poll);
 void poll_keyboard(void);
+void set_key_pressed(chip8_keyboard_key_t);
 bool is_keycode_pressed(chip8_keyboard_key_t);
 #endif // __CHIP8_KEYBOARD_H__

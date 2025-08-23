@@ -19,32 +19,66 @@
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
+bool keyboardStates[SDL_SCANCODE_COUNT] = {0};
 
 #define WINDOW_WIDTH 256
 #define WINDOW_HEIGHT 128
 
-static SDL_Scancode keyboard_map[CHIP8_KEYCODE_COUNT] = {
-    SDL_SCANCODE_1,
-    SDL_SCANCODE_2,
-    SDL_SCANCODE_3,
-    SDL_SCANCODE_4,
-    SDL_SCANCODE_Q,
-    SDL_SCANCODE_W,
-    SDL_SCANCODE_E,
-    SDL_SCANCODE_R,
-    SDL_SCANCODE_A,
-    SDL_SCANCODE_S,
-    SDL_SCANCODE_D,
-    SDL_SCANCODE_F,
-    SDL_SCANCODE_Z,
-    SDL_SCANCODE_X,
-    SDL_SCANCODE_C,
-    SDL_SCANCODE_V,
-};
-
-bool keyboard_handler(chip8_keyboard_key_t key)
+void keyboard_handler(SDL_Scancode sc)
 {
-    return SDL_GetKeyboardState(NULL)[keyboard_map[key]];
+    switch (sc)
+    {
+        case SDL_SCANCODE_1:
+            set_key_pressed(CHIP8_KEYCODE_0);
+            break;
+        case SDL_SCANCODE_2:
+            set_key_pressed(CHIP8_KEYCODE_1);
+            break;
+        case SDL_SCANCODE_3:
+            set_key_pressed(CHIP8_KEYCODE_2);
+            break;
+        case SDL_SCANCODE_4:
+            set_key_pressed(CHIP8_KEYCODE_3);
+            break;
+        case SDL_SCANCODE_Q:
+            set_key_pressed(CHIP8_KEYCODE_4);
+            break;
+        case SDL_SCANCODE_W:
+            set_key_pressed(CHIP8_KEYCODE_5);
+            break;
+        case SDL_SCANCODE_E:
+            set_key_pressed(CHIP8_KEYCODE_6);
+            break;
+        case SDL_SCANCODE_R:
+            set_key_pressed(CHIP8_KEYCODE_7);
+            break;
+        case SDL_SCANCODE_A:
+            set_key_pressed(CHIP8_KEYCODE_8);
+            break;
+        case SDL_SCANCODE_S:
+            set_key_pressed(CHIP8_KEYCODE_9);
+            break;
+        case SDL_SCANCODE_D:
+            set_key_pressed(CHIP8_KEYCODE_A);
+            break;
+        case SDL_SCANCODE_F:
+            set_key_pressed(CHIP8_KEYCODE_B);
+            break;
+        case SDL_SCANCODE_Z:
+            set_key_pressed(CHIP8_KEYCODE_C);
+            break;
+        case SDL_SCANCODE_X:
+            set_key_pressed(CHIP8_KEYCODE_D);
+            break;
+        case SDL_SCANCODE_C:
+            set_key_pressed(CHIP8_KEYCODE_E);
+            break;
+        case SDL_SCANCODE_V:
+            set_key_pressed(CHIP8_KEYCODE_F);
+            break;
+        default:
+            break;
+    }
 }
 
 void display_handler(uint8_t disp[CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH])
@@ -82,10 +116,16 @@ uint32_t timer_60hz_callback(void *ud, SDL_TimerID id, uint32_t interval) {
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
     bool debug_mode = false;
-    if (argc > 1)   {
-        if (strcmp("-d", argv[1]) == 0)
-            debug_mode = true;
+    if (argc < 2) {
+        printf("Usage: chip8 [-d] rom.bin\n");
+        exit(1);
     }
+    
+    if (argc == 3){
+        if (strcmp("-d", argv[1]) == 0) {
+            debug_mode = true;
+        }
+    } 
 
     SDL_SetAppMetadata("CHIP-8 Emulator", "1.0", "Emulator");
 
@@ -99,15 +139,17 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         return SDL_APP_FAILURE;
     }
 
-    //Load binary from testbin folder - default IMB logo
     uint8_t buffer[BIN_BUFFER_SIZE];
     FILE *fp = NULL;
     if(debug_mode)
-        fp = fopen("testbin/delay_timer.ch8", "rb");
+        fp = fopen(argv[2], "rb");
     else    
-        fp = fopen("testbin/ibm_logo.ch8", "rb");
+        fp = fopen(argv[1], "rb");
     
-    if (fp == NULL) {return 1;}
+    if (fp == NULL) {
+        perror("Could not open binary");
+        return 1;
+    }
     
     size_t bytes = fread(buffer, sizeof(uint8_t), BIN_BUFFER_SIZE, fp);
     fclose(fp);
@@ -116,7 +158,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         .rom = buffer,
         .rom_size = bytes,
         .display_handler = display_handler,
-        .keyboard_handler = keyboard_handler,
+        .keyboard_handler = NULL,
         .keyboard_poll = SDL_PumpEvents, //we need a handler to update input before polling for keyboard presses
         .log_enable = true,
         .log_type = debug_mode ? CHIP8_LOG_DEBUG:CHIP8_LOG_INFO,
@@ -136,6 +178,8 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
     if (event->type == SDL_EVENT_QUIT) {
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
+    }else if (event->type == SDL_EVENT_KEY_UP){
+        keyboard_handler(event->key.scancode);
     }
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }

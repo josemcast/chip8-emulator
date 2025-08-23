@@ -13,21 +13,17 @@ cmake --build build -j
 
 ## How to run
 
-**GUI mode**
-
 ```bash
-./build/chip8
+./build/chip8 rom.bin
 ```
 
-will run the emulator and show the IBM logo on the screen ([SDL3](https://github.com/libsdl-org/SDL) needed).
+will start the emulator and execute chip-8 rom provided as argument ([SDL3](https://github.com/libsdl-org/SDL) needed).
 
-**Debug mode**
+To enable debug mode, where you can see internal state dump on each step, run the emulator with the "-d" option.
 
 ```bash
 ./build/chip8 -d
 ```
-
-will run the emulator with custom debug.ch8 file and print to stdout
 
 ## Supported CHIP8 Opcodes
 
@@ -51,7 +47,6 @@ will run the emulator with custom debug.ch8 file and print to stdout
 | 8XY6       | Shift right         |
 | 8XY7       | Subtract with Flag  |
 | 8XYE       | Shift left          |
-| 9XY0       | Conditional         |
 | 9XY0       | Conditional         |
 | ANNN       | Set Index           |
 | BNNN       | Jump + offset       |

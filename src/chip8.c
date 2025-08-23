@@ -123,7 +123,7 @@ static void opcode0_handler(uint16_t mi){
             vm.pc = (vm.memory + chip8_stack_pop());
             break;
         default:
-            CHIP8_TRACELOG(CHIP8_LOG_ERROR, "not implemented yet\n");
+            CHIP8_TRACELOG(CHIP8_LOG_ERROR, "not implemented\n");
             break;
     }
 
@@ -300,72 +300,87 @@ static void opcodeF_handler(uint16_t mi){
             vm.registers[VX_GET(mi)] = vm.delay_timer;
             break;
         case 0x0A: // wait for key
-            while(1){
-                poll_keyboard();
-                if(is_keycode_pressed(CHIP8_KEYCODE_0)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_0;
-                    break;        
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_1)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_1;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_2)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_2;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_3)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_3;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_4)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_4;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_5)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_5;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_6)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_6;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_7)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_7;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_8)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_8;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_9)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_9;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_A)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_A;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_B)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_B;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_C)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_C;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_D)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_D;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_E)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_E;
-                    break;
-                }
-                if(is_keycode_pressed(CHIP8_KEYCODE_F)){
-                    vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_F;
-                    break;
-                }
+            //decrement pc so that we keep executing Fx0A until key is pressed
+            vm.pc -= 2;
+            if(is_keycode_pressed(CHIP8_KEYCODE_0)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_0;
+                vm.pc += 2;
+                break;        
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_1)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_1;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_2)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_2;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_3)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_3;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_4)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_4;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_5)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_5;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_6)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_6;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_7)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_7;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_8)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_8;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_9)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_9;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_A)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_A;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_B)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_B;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_C)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_C;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_D)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_D;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_E)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_E;
+                vm.pc += 2;
+                break;
+            }
+            if(is_keycode_pressed(CHIP8_KEYCODE_F)){
+                vm.registers[VX_GET(mi)] = CHIP8_KEYCODE_F;
+                vm.pc += 2;
+                break;
             }
             break;
         case 0x15: // Set delay timer
