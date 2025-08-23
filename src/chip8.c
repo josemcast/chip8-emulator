@@ -26,11 +26,14 @@ void chip8_init(chip8_config_t *config){
     vm.pc = (vm.memory + ROM_INIT);
     memset(vm.registers,0, VX_COUNT);
     vm.index = 0x0000;
-    
-    running = 1;
+
+    vm.delay_timer = 0xFF;
+    vm.sound_timer = 0x00;
 
     init_display(config->display_handler);
-    init_keyboard(config->keyboard_handler, config->keyboard_poll);       
+    init_keyboard(config->keyboard_handler, config->keyboard_poll);
+
+    running = 1;
 }
 
 void chip8_load_memory(uint8_t *bin, size_t size){
@@ -72,6 +75,7 @@ void chip8_dump_state(){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "==========================================================\n");
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "PC:%3lX\n", (vm.pc - vm.memory));
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "I:%3X\n", vm.index);
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Delay Timer:%2X\n", vm.delay_timer);
     for (int i = 0; i < VX_COUNT; i++){
         if(i % 4 == 0) CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "\n");
         CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "V%1X:%3X ", i, vm.registers[i]);
@@ -394,6 +398,10 @@ void (*process_opcodes[])(uint16_t) = {
     opcodeE_handler,
     opcodeF_handler
 };
+
+void chip8_clock_60hz() {
+    vm.delay_timer--;
+}
 
 void chip8_step() {
 

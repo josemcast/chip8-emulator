@@ -71,14 +71,19 @@ typedef struct{
     uint8_t *pc;
     uint8_t registers[VX_COUNT];
     uint16_t index;
+    uint8_t delay_timer;
+    uint8_t sound_timer;
 } chip8_vm_t;
 
 
 //////////////////// API /////////////////////////////////////////////////////////////
 void chip8_init(chip8_config_t *);
-void chip8_step();
 void chip8_load_fonts(void);
 void chip8_load_memory(uint8_t *,size_t);
 void chip8_dump_memory(void);
+void chip8_clock_60hz();
+void chip8_step();
+
+
 
 #endif // __CHIP8_H__

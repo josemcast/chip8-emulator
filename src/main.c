@@ -73,6 +73,12 @@ void display_handler(uint8_t disp[CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH])
     SDL_RenderPresent(renderer);
 }
 
+uint32_t timer_60hz_callback(void *ud, SDL_TimerID id, uint32_t interval) {
+    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "INTERVAL: %d\n", interval);
+    chip8_clock_60hz();
+    return TIME_60HZ_MS;
+}
+
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
@@ -119,6 +125,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     };
 
     chip8_init(&cfg);
+    SDL_AddTimer(TIME_60HZ_MS, timer_60hz_callback, NULL);
     // if(debug_mode)
     //     chip8_dump_memory();
 

@@ -9,4 +9,5 @@
 
 #define RANDI()                 (rand() % (UINT8_MAX + 1))
 
+#define TIME_60HZ_MS            ((1.0 / 60.0) * 1000.0) 
 #endif //__CHIP8_UTILS_H__
