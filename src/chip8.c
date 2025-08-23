@@ -296,6 +296,9 @@ static void opcodeF_handler(uint16_t mi){
     uint8_t mode = IMME_GET(mi);
     switch (mode)
     {
+        case 0x07: // Get current delay timer value
+            vm.registers[VX_GET(mi)] = vm.delay_timer;
+            break;
         case 0x0A: // wait for key
             while(1){
                 poll_keyboard();
@@ -365,12 +368,34 @@ static void opcodeF_handler(uint16_t mi){
                 }
             }
             break;
-        case 0x29:
+        case 0x15: // Set delay timer
+            vm.delay_timer = vm.registers[VX_GET(mi)];
+            break;
+        case 0x18: // Set sound timer
+            vm.sound_timer = vm.registers[VX_GET(mi)];
+            break;
+        case 0x29: // Set index to font char
             uint8_t key = vm.registers[VX_GET(mi)] & 0xF;
             vm.index = FONTS_INIT + key * FONT_HEIGHT;
             break;
-        case 0x1E:
+        case 0x1E: // Add Vx to index
             vm.index  += vm.registers[VX_GET(mi)];
+            break;
+        case 0x33: // BCD conversion
+            uint8_t tmp = vm.registers[VX_GET(mi)];
+            vm.memory[vm.index] = tmp / 100;
+            vm.memory[vm.index+1] =  (tmp - vm.memory[vm.index]*100) / 10;
+            vm.memory[vm.index+2] = tmp % 10;
+            break;
+        case 0x55: // Store memory
+            for(int i = 0; i <= VX_GET(mi); i++){
+                vm.memory[vm.index + i] = vm.registers[i];
+            }
+            break;
+        case 0x65: //Load memory
+            for(int i = 0; i <= VX_GET(mi); i++){
+                vm.registers[i] = vm.memory[vm.index + i];
+            }
             break;
         case 0xFF:
             exit(0);

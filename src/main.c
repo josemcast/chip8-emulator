@@ -74,7 +74,6 @@ void display_handler(uint8_t disp[CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH])
 }
 
 uint32_t timer_60hz_callback(void *ud, SDL_TimerID id, uint32_t interval) {
-    CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "INTERVAL: %d\n", interval);
     chip8_clock_60hz();
     return TIME_60HZ_MS;
 }
@@ -104,7 +103,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     uint8_t buffer[BIN_BUFFER_SIZE];
     FILE *fp = NULL;
     if(debug_mode)
-        fp = fopen("testbin/debug.ch8", "rb");
+        fp = fopen("testbin/delay_timer.ch8", "rb");
     else    
         fp = fopen("testbin/ibm_logo.ch8", "rb");
     

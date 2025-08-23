@@ -58,5 +58,11 @@ will run the emulator with custom debug.ch8 file and print to stdout
 | CXNN       | Random              |
 | EX9E       | Skip if Key         |
 | EXA1       | Skip if not Key     |
+| FX07       | Get delay timer     |
 | FX0A       | Get Key             |
+| FX15       | Set delay timer     |
+| FX18       | Set sound timer     |
 | FX1E       | Add to index        |
+| FX33       | BCD conversion      |
+| FX55       | Store               |
+| FX65       | Load                |
