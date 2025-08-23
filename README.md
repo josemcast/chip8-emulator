@@ -59,3 +59,4 @@ will run the emulator with custom debug.ch8 file and print to stdout
 | EX9E       | Skip if Key         |
 | EXA1       | Skip if not Key     |
 | FX0A       | Get Key             |
+| FX1E       | Add to index        |

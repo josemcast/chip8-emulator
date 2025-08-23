@@ -365,6 +365,9 @@ static void opcodeF_handler(uint16_t mi){
             uint8_t key = vm.registers[VX_GET(mi)] & 0xF;
             vm.index = FONTS_INIT + key * FONT_HEIGHT;
             break;
+        case 0x1E:
+            vm.index  += vm.registers[VX_GET(mi)];
+            break;
         case 0xFF:
             exit(0);
             break;
