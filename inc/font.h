@@ -4,6 +4,10 @@
 
 #define FONT_HEIGHT        (5)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 uint8_t chip8_fonts[] = {
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -23,4 +27,7 @@ uint8_t chip8_fonts[] = {
     0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
+#ifdef __cplusplus
+}
+#endif
 #endif // __CHIP8_FONT_H__

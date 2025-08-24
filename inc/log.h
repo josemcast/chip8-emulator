@@ -3,6 +3,10 @@
 
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LOG_BUFFER_MSG_SIZE 256
 
 typedef enum {
@@ -20,4 +24,7 @@ extern void add_log(chip8_logtype_t
 
 #define CHIP8_TRACELOG(type, msg, ...)       add_log(type, msg, ##__VA_ARGS__);
 
+#ifdef __cplusplus
+}
+#endif
 #endif //__CHIP8_LOG_H__

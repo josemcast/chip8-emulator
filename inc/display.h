@@ -6,6 +6,9 @@
 #define CHIP8_DISPLAY_WIDTH    64
 #define CHIP8_DISPLAY_HEIGHT   32
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 //Callback to graphics library used by show_display()
 typedef void (*chip8_display_handler)(uint8_t [CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH]);
 
@@ -14,4 +17,7 @@ void clear_display(void);
 uint8_t set_display(uint8_t, uint8_t, uint8_t);
 void show_display(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif //__DISPLAY_H__

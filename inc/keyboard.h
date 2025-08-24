@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     CHIP8_KEYCODE_0,
     CHIP8_KEYCODE_1,
@@ -36,4 +40,8 @@ void init_keyboard(chip8_keyboard_handler, chip8_keyboard_poll);
 void poll_keyboard(void);
 void set_key_pressed(chip8_keyboard_key_t);
 bool is_keycode_pressed(chip8_keyboard_key_t);
+
+#ifdef __cplusplus
+}
+#endif
 #endif // __CHIP8_KEYBOARD_H__

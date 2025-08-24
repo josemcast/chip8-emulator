@@ -6,6 +6,9 @@
 #include <display.h>
 #include <keyboard.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 //////////////////// MEMORY LAYOUT AND SIZE //////////////////////////////////////////
 #define ROM_INIT    (0x200)
 #define FONTS_INIT  (0x050)
@@ -84,6 +87,7 @@ void chip8_dump_memory(void);
 void chip8_clock_60hz();
 void chip8_step();
 
-
-
+#ifdef __cplusplus
+}
+#endif
 #endif // __CHIP8_H__

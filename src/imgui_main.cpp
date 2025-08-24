@@ -8,6 +8,9 @@
 #define BIN_BUFFER_SIZE         256
 
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
+#include "imgui.h"
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_sdlrenderer3.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
@@ -21,8 +24,12 @@ static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 bool keyboardStates[SDL_SCANCODE_COUNT] = {0};
 
-#define WINDOW_WIDTH 256
-#define WINDOW_HEIGHT 128
+bool show_demo_window;
+bool show_another_window;
+
+
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 
 void keyboard_handler(SDL_Scancode sc)
 {
@@ -164,12 +171,27 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     // if(debug_mode)
     //     chip8_dump_memory();
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
+    ImGui_ImplSDLRenderer3_Init(renderer);
+
+    show_demo_window = true;
+    show_another_window = false;
+
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
+    ImGui_ImplSDL3_ProcessEvent(event);
     if (event->type == SDL_EVENT_QUIT) {
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
     }else if (event->type == SDL_EVENT_KEY_UP){
@@ -181,12 +203,42 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
+    ImGuiIO &io = ImGui::GetIO(); (void)io;
+    ImGui_ImplSDLRenderer3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);  /* black, full alpha */
     SDL_RenderClear(renderer);  /* start with a blank canvas. */
     SDL_SetRenderDrawColor(renderer, 0, 117, 44, SDL_ALPHA_OPAQUE);
     
-    chip8_step();
+    static bool start_emulator = 0;
+    
+    {
+        ImGui::Begin("CHIP-8 Emulator - Debug");
+        if (start_emulator == true){
+            if (ImGui::Button("Stop"))
+                start_emulator = false;
+        } else {
+            if (ImGui::Button("Start"))
+                start_emulator = true;
+        }
+
+        if (start_emulator) {
+            ImGui::SameLine();
+            ImGui::Text("Running");
+        }
+
+        ImGui::End();
+    }
+
+    // Rendering
+    ImGui::Render();
+    SDL_SetRenderScale(renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
+    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
+    
+    if(start_emulator)
+        chip8_step();
     
     SDL_RenderPresent(renderer);
     
