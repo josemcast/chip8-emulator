@@ -5,10 +5,11 @@
 #include <chip8.h>
 #include <display.h>
 #include <keyboard.h>
-#include <log.h>
 #include <font.h>
 #include <utilities.h>
 
+#define CHIP8_LOG_IMPLEMENTATION
+#include <log.h>
 
 static chip8_vm_t vm;   
 static bool running = 0;
