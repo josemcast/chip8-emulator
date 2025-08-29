@@ -124,7 +124,7 @@ static void opcode0_handler(uint16_t mi){
             vm.pc = (vm.memory + chip8_stack_pop());
             break;
         default:
-            CHIP8_TRACELOG(CHIP8_LOG_ERROR, "not implemented\n");
+            CHIP8_TRACELOG(CHIP8_LOG_ERROR, "[%04x] not implemented\n", mi);
             //exit(0);
             break;
     }
@@ -227,6 +227,7 @@ static void opcode8_handler(uint16_t mi){
             vm.registers[VX_GET(mi)] = (vm.registers[VY_GET(mi)] << 1);
             break;  
         default:
+            CHIP8_TRACELOG(CHIP8_LOG_ERROR, "[%04x] not implemented\n", mi);
             exit(0);
             break;
     }
@@ -289,6 +290,7 @@ static void opcodeE_handler(uint16_t mi){
                 vm.pc += 2;
             break;
         default:
+            CHIP8_TRACELOG(CHIP8_LOG_ERROR, "[%04x] not implemented\n", mi);
             exit(0);
             break;
     }
@@ -417,6 +419,7 @@ static void opcodeF_handler(uint16_t mi){
             }
             break;
         default:
+            CHIP8_TRACELOG(CHIP8_LOG_ERROR, "[%04x] not implemented\n", mi);
             exit(0);
             break;
     }
