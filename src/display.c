@@ -36,7 +36,6 @@ uint8_t set_display(uint8_t vx, uint8_t vy, uint8_t byte){
         }
         vx++;
     }
-
     return collision;
 }
 

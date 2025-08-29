@@ -5,7 +5,7 @@
 
 #include <log.h>
 
-#define BIN_BUFFER_SIZE         256
+#define BIN_BUFFER_SIZE         0xFFF
 
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
@@ -29,16 +29,16 @@ void keyboard_handler(SDL_Scancode sc)
     switch (sc)
     {
         case SDL_SCANCODE_1:
-            set_key_pressed(CHIP8_KEYCODE_0);
-            break;
-        case SDL_SCANCODE_2:
             set_key_pressed(CHIP8_KEYCODE_1);
             break;
-        case SDL_SCANCODE_3:
+        case SDL_SCANCODE_2:
             set_key_pressed(CHIP8_KEYCODE_2);
             break;
-        case SDL_SCANCODE_4:
+        case SDL_SCANCODE_3:
             set_key_pressed(CHIP8_KEYCODE_3);
+            break;
+        case SDL_SCANCODE_4:
+            set_key_pressed(CHIP8_KEYCODE_C);
             break;
         case SDL_SCANCODE_Q:
             set_key_pressed(CHIP8_KEYCODE_4);
@@ -50,28 +50,28 @@ void keyboard_handler(SDL_Scancode sc)
             set_key_pressed(CHIP8_KEYCODE_6);
             break;
         case SDL_SCANCODE_R:
-            set_key_pressed(CHIP8_KEYCODE_7);
-            break;
-        case SDL_SCANCODE_A:
-            set_key_pressed(CHIP8_KEYCODE_8);
-            break;
-        case SDL_SCANCODE_S:
-            set_key_pressed(CHIP8_KEYCODE_9);
-            break;
-        case SDL_SCANCODE_D:
-            set_key_pressed(CHIP8_KEYCODE_A);
-            break;
-        case SDL_SCANCODE_F:
-            set_key_pressed(CHIP8_KEYCODE_B);
-            break;
-        case SDL_SCANCODE_Z:
-            set_key_pressed(CHIP8_KEYCODE_C);
-            break;
-        case SDL_SCANCODE_X:
             set_key_pressed(CHIP8_KEYCODE_D);
             break;
-        case SDL_SCANCODE_C:
+        case SDL_SCANCODE_A:
+            set_key_pressed(CHIP8_KEYCODE_7);
+            break;
+        case SDL_SCANCODE_S:
+            set_key_pressed(CHIP8_KEYCODE_8);
+            break;
+        case SDL_SCANCODE_D:
+            set_key_pressed(CHIP8_KEYCODE_9);
+            break;
+        case SDL_SCANCODE_F:
             set_key_pressed(CHIP8_KEYCODE_E);
+            break;
+        case SDL_SCANCODE_Z:
+            set_key_pressed(CHIP8_KEYCODE_A);
+            break;
+        case SDL_SCANCODE_X:
+            set_key_pressed(CHIP8_KEYCODE_0)    ;
+            break;
+        case SDL_SCANCODE_C:
+            set_key_pressed(CHIP8_KEYCODE_B);
             break;
         case SDL_SCANCODE_V:
             set_key_pressed(CHIP8_KEYCODE_F);
@@ -181,11 +181,11 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
-
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);  /* black, full alpha */
     SDL_RenderClear(renderer);  /* start with a blank canvas. */
     SDL_SetRenderDrawColor(renderer, 0, 117, 44, SDL_ALPHA_OPAQUE);
     
+    SDL_Delay(1);
     chip8_step();
     
     SDL_RenderPresent(renderer);

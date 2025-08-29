@@ -125,6 +125,7 @@ static void opcode0_handler(uint16_t mi){
             break;
         default:
             CHIP8_TRACELOG(CHIP8_LOG_ERROR, "not implemented\n");
+            //exit(0);
             break;
     }
 
@@ -226,6 +227,7 @@ static void opcode8_handler(uint16_t mi){
             vm.registers[VX_GET(mi)] = (vm.registers[VY_GET(mi)] << 1);
             break;  
         default:
+            exit(0);
             break;
     }
 
@@ -247,7 +249,7 @@ static void opcodeA_handler(uint16_t mi){
 //jump to NNN + offset
 static void opcodeB_handler(uint16_t mi){
     CHIP8_TRACELOG(CHIP8_LOG_DEBUG, "Opcode B - %X\n", mi);
-    vm.pc = (vm.memory + ADDR_GET(mi) + vm.memory[CHIP8_V0]);
+    vm.pc = (vm.memory + ADDR_GET(mi) + vm.registers[CHIP8_V0]);
 }
 
 //Set VX to RAND AND NN
@@ -263,9 +265,10 @@ static void opcodeD_handler(uint16_t mi){
     uint8_t vy = vm.registers[VY_GET(mi)];
     uint8_t n = NIBBLE_GET(mi);
     uint8_t collision = 0;
+    vm.registers[CHIP8_VF] = 0;
     for(int i = 0; i < n; i++){
         collision = set_display(vx, vy+i, (vm.memory[vm.index+i]));
-        vm.registers[CHIP8_VF] = collision;
+        vm.registers[CHIP8_VF] =  vm.registers[CHIP8_VF]==1? 1: collision;
     }
 }
 
@@ -277,7 +280,6 @@ static void opcodeE_handler(uint16_t mi){
     {
         case 0x9E: //skip if key in VX is pressed
             poll_keyboard();
-            printf("aqui\n");
             if(is_keycode_pressed(vm.registers[VX_GET(mi)]))
                 vm.pc += 2;
             break;
@@ -287,6 +289,7 @@ static void opcodeE_handler(uint16_t mi){
                 vm.pc += 2;
             break;
         default:
+            exit(0);
             break;
     }
 }
@@ -413,10 +416,8 @@ static void opcodeF_handler(uint16_t mi){
                 vm.registers[i] = vm.memory[vm.index + i];
             }
             break;
-        case 0xFF:
-            exit(0);
-            break;
         default:
+            exit(0);
             break;
     }
 }
