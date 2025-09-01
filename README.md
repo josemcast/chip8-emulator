@@ -5,7 +5,6 @@ CHIP-8 Emulator written in C
 ## Dependencies
 
 * [SDL3](https://github.com/libsdl-org/SDL)
-* [IMGUI](https://github.com/ocornut/imgui) (Optional)
 
 ## Get Started
 
@@ -17,14 +16,6 @@ cd build
 make -j
 ```
 
-The Emulator offers an ImGUI mode, where ImGUI is used for debugging and real-time internal state visualization
-
-```bash
-cd build
-cmake . -DIMGUI_BUILD=ON
-make -j
-```
-
 ## How to run
 
 ```bash
@@ -33,10 +24,10 @@ make -j
 
 will start the emulator and execute chip-8 rom provided as argument.
 
-The emulator also provides a terminal debug mode, where you can see internal state dump on each step.
+The emulator also provides a script mode, where you can provide a `config.lua` file to modify Emulator startup configuration.
 
 ```bash
-./build/chip8 -d rom.bin
+./build/chip8 -s
 ```
 
 ## Supported CHIP8 Opcodes

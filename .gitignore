@@ -64,3 +64,6 @@ dkms.conf
 #imgui
 imgui
 *.ini
+
+#lua files
+lua

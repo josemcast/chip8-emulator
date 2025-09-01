@@ -11,6 +11,10 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+
 #include <chip8.h>
 #include <display.h>
 #include <keyboard.h>
@@ -110,15 +114,14 @@ uint32_t timer_60hz_callback(void *ud, SDL_TimerID id, uint32_t interval) {
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
     bool debug_mode = false;
+    bool script_mode = false;
     if (argc < 2) {
-        printf("Usage: chip8 [-d] rom.bin\n");
+        fprintf(stderr, "Usage: chip8 [-s] [rom.bin]\n");
         exit(1);
     }
     
-    if (argc == 3){
-        if (strcmp("-d", argv[1]) == 0) {
-            debug_mode = true;
-        }
+    if (strcmp("-s", argv[1]) == 0) {
+            script_mode = true;
     } 
 
     SDL_SetAppMetadata("CHIP-8 Emulator", "1.0", "Emulator");
@@ -133,12 +136,51 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         return SDL_APP_FAILURE;
     }
 
+    const char *rom = NULL;
+
+    if(script_mode) {
+        lua_State *L = luaL_newstate();
+        luaL_openlibs(L);
+
+        if(luaL_dofile(L, "config.lua") != LUA_OK) {
+            fprintf(stderr,"Could not load config file: %s\n", lua_tostring(L, -1));
+            lua_close(L);
+            exit(1);
+        }
+
+        if(!lua_istable(L, -1)){
+            fprintf(stderr, "[config.lua] return value is not a table\n");
+            lua_close(L);
+            exit(1);
+        }
+
+        lua_pushstring(L, "rom_filename");
+        lua_gettable(L, -2);
+    
+        if (lua_isstring(L, -1) & !lua_isnumber(L, -1))
+            rom = lua_tostring(L, -1);    
+        
+        if (rom[0]== '\0'){
+            fprintf(stderr, "[config.lua] rom filename not valid\n");
+            lua_close(L);
+            exit(1);
+        }
+
+        lua_pop(L, 1);
+        
+        lua_pushstring(L, "debug_mode");
+        lua_gettable(L, -2);
+        debug_mode = lua_isboolean(L, -1) ? lua_toboolean(L, -1): false;
+
+        lua_close(L);
+    } else {
+        rom = argv[1];
+        debug_mode = false;
+    }
+
     uint8_t buffer[BIN_BUFFER_SIZE];
     FILE *fp = NULL;
-    if(debug_mode)
-        fp = fopen(argv[2], "rb");
-    else    
-        fp = fopen(argv[1], "rb");
+    fp = fopen(rom, "rb");
     
     if (fp == NULL) {
         perror("Could not open binary");
