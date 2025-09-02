@@ -7,7 +7,7 @@
 
 #define BIN_BUFFER_SIZE         0xFFF
 
-#define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
+//#define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
@@ -19,10 +19,13 @@
 #include <display.h>
 #include <keyboard.h>
 #include <utilities.h>
+#include <script.h>
 
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
+static uint8_t display_scale_factor = 4;                         //factor to scale up original 64 x 32 CHIP-8 display 
+
 bool keyboardStates[SDL_SCANCODE_COUNT] = {0};
 
 #define WINDOW_WIDTH 256
@@ -87,14 +90,13 @@ void keyboard_handler(SDL_Scancode sc)
 
 void display_handler(uint8_t disp[CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH])
 {
-    const uint8_t scale_factor = 4; //scale 4X: from 64 x 32  to 256 x 128
     for(int i = 0; i<CHIP8_DISPLAY_HEIGHT; ++i){
         for(int j = 0; j < CHIP8_DISPLAY_WIDTH; ++j){
             if (disp[i][j] == 0)
                 continue;
-            float col = scale_factor*j + (WINDOW_WIDTH / 2) - scale_factor*(CHIP8_DISPLAY_WIDTH / 2);
-            float row = scale_factor*i;
-            for(int dy = 0; dy < scale_factor; ++dy){
+            float col = display_scale_factor*j + (WINDOW_WIDTH / 2) - display_scale_factor*(CHIP8_DISPLAY_WIDTH / 2);
+            float row = display_scale_factor*i;
+            for(int dy = 0; dy < display_scale_factor; ++dy){
                 uint32_t dy_row = row + dy;
                 SDL_RenderPoint(renderer, col, dy_row);
                 SDL_RenderPoint(renderer, col + 1, dy_row);
@@ -110,9 +112,8 @@ uint32_t timer_60hz_callback(void *ud, SDL_TimerID id, uint32_t interval) {
     return TIME_60HZ_MS;
 }
 
-/* This function runs once at startup. */
-SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+
     bool debug_mode = false;
     bool script_mode = false;
     if (argc < 2) {
@@ -203,40 +204,29 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     chip8_init(&cfg);
     SDL_AddTimer(TIME_60HZ_MS, timer_60hz_callback, NULL);
-    // if(debug_mode)
-    //     chip8_dump_memory();
+    SDL_Event e;
+    while(1) {
 
-    return SDL_APP_CONTINUE;  /* carry on with the program! */
-}
+        if(SDL_PollEvent(&e) != 0) {
+            if(e.type == SDL_EVENT_QUIT)
+                break;
+            else if(e.type == SDL_EVENT_KEY_UP)
+                keyboard_handler(e.key.scancode);
+        }
 
-/* This function runs when a new event (mouse input, keypresses, etc) occurs. */
-SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
-{
-    if (event->type == SDL_EVENT_QUIT) {
-        return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
-    }else if (event->type == SDL_EVENT_KEY_UP){
-        keyboard_handler(event->key.scancode);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);  /* black, full alpha */
+        SDL_RenderClear(renderer);  /* start with a blank canvas. */
+        SDL_SetRenderDrawColor(renderer, 0, 117, 44, SDL_ALPHA_OPAQUE);
+    
+        SDL_Delay(1);
+        chip8_step();
+        if(script_mode)
+            chip8_script_run("run.lua");
+            
+        SDL_RenderPresent(renderer);
     }
-    return SDL_APP_CONTINUE;  /* carry on with the program! */
-}
 
-/* This function runs once per frame, and is the heart of the program. */
-SDL_AppResult SDL_AppIterate(void *appstate)
-{
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);  /* black, full alpha */
-    SDL_RenderClear(renderer);  /* start with a blank canvas. */
-    SDL_SetRenderDrawColor(renderer, 0, 117, 44, SDL_ALPHA_OPAQUE);
-    
-    SDL_Delay(1);
-    chip8_step();
-    
-    SDL_RenderPresent(renderer);
-    
-    return SDL_APP_CONTINUE;  /* carry on with the program! */
-}
-
-/* This function runs once at shutdown. */
-void SDL_AppQuit(void *appstate, SDL_AppResult result)
-{
-    /* SDL will clean up the window/renderer for us. */
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 }

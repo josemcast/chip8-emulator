@@ -2,6 +2,7 @@
 #define __CHIP8_LOG_H__
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +34,6 @@ void add_log(chip8_logtype_t, const char*, ...);
 #undef CHIP8_LOG_IMPLEMENTATION
 #include <stdarg.h>
 #include <stdbool.h>
-#include <log.h>
 
 
 static chip8_logtype_t current_log_level = CHIP8_LOG_INFO;

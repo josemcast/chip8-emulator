@@ -11,7 +11,7 @@
 #define CHIP8_LOG_IMPLEMENTATION
 #include <log.h>
 
-static chip8_vm_t vm;   
+chip8_vm_t vm;   
 static bool running = 0;
 
 ////////////////////////// Initialization functions /////////////////////////////////////////////////
