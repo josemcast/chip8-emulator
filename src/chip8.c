@@ -32,7 +32,7 @@ void chip8_init(chip8_config_t *config){
     vm.sound_timer = 0x00;
 
     init_display(config->display_handler);
-    init_keyboard(config->keyboard_handler, config->keyboard_poll);
+    init_keyboard(config->keyboard_poll);
 
     running = 1;
 }

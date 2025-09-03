@@ -24,12 +24,10 @@
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
-static uint8_t display_scale_factor = 4;                         //factor to scale up original 64 x 32 CHIP-8 display 
+static uint8_t display_scale_factor = 8;                         //factor to scale up original 64 x 32 CHIP-8 display 
 
-bool keyboardStates[SDL_SCANCODE_COUNT] = {0};
-
-#define WINDOW_WIDTH 256
-#define WINDOW_HEIGHT 128
+#define WINDOW_WIDTH 512
+#define WINDOW_HEIGHT 256
 
 void keyboard_handler(SDL_Scancode sc)
 {
@@ -94,14 +92,13 @@ void display_handler(uint8_t disp[CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH])
         for(int j = 0; j < CHIP8_DISPLAY_WIDTH; ++j){
             if (disp[i][j] == 0)
                 continue;
+            //center CHIP-8 display based on current window dimensions
             float col = display_scale_factor*j + (WINDOW_WIDTH / 2) - display_scale_factor*(CHIP8_DISPLAY_WIDTH / 2);
             float row = display_scale_factor*i;
             for(int dy = 0; dy < display_scale_factor; ++dy){
                 uint32_t dy_row = row + dy;
-                SDL_RenderPoint(renderer, col, dy_row);
-                SDL_RenderPoint(renderer, col + 1, dy_row);
-                SDL_RenderPoint(renderer, col + 2, dy_row);
-                SDL_RenderPoint(renderer, col + 3, dy_row);
+                for(int dx = 0; dx < display_scale_factor; ++dx)
+                    SDL_RenderPoint(renderer, col+dx, dy_row);
             }
         }
     }
@@ -116,12 +113,19 @@ int main(int argc, char *argv[]) {
 
     bool debug_mode = false;
     bool script_mode = false;
+
     if (argc < 2) {
-        fprintf(stderr, "Usage: chip8 [-s] [rom.bin]\n");
+        fprintf(stderr, "Usage: chip8 [rom.bin | -s] [config_script] [run_script]\n");
         exit(1);
     }
     
     if (strcmp("-s", argv[1]) == 0) {
+            if (argc < 4){
+                fprintf(stderr, "missing arguments after -s option\n");
+                fprintf(stderr, "Usage: chip8 [rom.bin | -s] [config_script] [run_script]\n");
+                exit(1);
+            }
+                
             script_mode = true;
     } 
 
@@ -143,7 +147,7 @@ int main(int argc, char *argv[]) {
         lua_State *L = luaL_newstate();
         luaL_openlibs(L);
 
-        if(luaL_dofile(L, "config.lua") != LUA_OK) {
+        if(luaL_dofile(L, argv[2]) != LUA_OK) {
             fprintf(stderr,"Could not load config file: %s\n", lua_tostring(L, -1));
             lua_close(L);
             exit(1);
@@ -195,7 +199,6 @@ int main(int argc, char *argv[]) {
         .rom = buffer,
         .rom_size = bytes,
         .display_handler = display_handler,
-        .keyboard_handler = NULL,
         .keyboard_poll = SDL_PumpEvents, //we need a handler to update input before polling for keyboard presses
         .log_enable = true,
         .log_type = debug_mode ? CHIP8_LOG_DEBUG:CHIP8_LOG_INFO,
@@ -204,6 +207,7 @@ int main(int argc, char *argv[]) {
 
     chip8_init(&cfg);
     SDL_AddTimer(TIME_60HZ_MS, timer_60hz_callback, NULL);
+
     SDL_Event e;
     while(1) {
 
@@ -221,8 +225,8 @@ int main(int argc, char *argv[]) {
         SDL_Delay(1);
         chip8_step();
         if(script_mode)
-            chip8_script_run("run.lua");
-            
+            chip8_script_run(argv[3]);
+
         SDL_RenderPresent(renderer);
     }
 

@@ -1,13 +1,11 @@
 #include <keyboard.h>
 #include <string.h>
 
-static chip8_keyboard_handler kb_handler;
 static chip8_keyboard_poll kb_poll;
 static bool keyboard[CHIP8_KEYCODE_COUNT];
 
-void init_keyboard(chip8_keyboard_handler keyboard_handler, chip8_keyboard_poll keyboard_poll){
+void init_keyboard(chip8_keyboard_poll keyboard_poll){
     memset(keyboard, 0, CHIP8_KEYCODE_COUNT);    
-    kb_handler = keyboard_handler;
     kb_poll = keyboard_poll;
 }
 

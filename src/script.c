@@ -15,8 +15,20 @@ static int chip8_getPC(lua_State *L) {
     return 1;
 }
 
+static int chip8_getRegister(lua_State *L) {
+    uint8_t reg = luaL_checkinteger(L, 1);
+    if(reg > 0xF)
+        lua_pushnil(L);
+    else
+        lua_pushnumber(L, vm.registers[reg]);
+
+    return 1;
+}
+
 const luaL_Reg chip8_clbck[] = {
     {.name = "getPC", chip8_getPC},
+    {.name = "getRegister", chip8_getRegister},
+    {NULL, NULL},
 };
 
 static int chip8_lib(lua_State *L) {

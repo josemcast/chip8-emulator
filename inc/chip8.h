@@ -60,7 +60,6 @@ typedef struct{
     uint8_t *rom;
     size_t rom_size;
     chip8_display_handler display_handler;
-    chip8_keyboard_handler keyboard_handler;
     chip8_keyboard_poll keyboard_poll;
     bool log_enable;
     chip8_logtype_t log_type;
