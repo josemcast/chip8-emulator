@@ -11,6 +11,7 @@ CHIP-8 Emulator written in C
 ```bash
 git clone https://github.com/josemcast/chip8-emulator.git
 cd chip8-emulator
+git clone https://github.com/libsdl-org/SDL.git SDL
 cmake -S . -B build
 cd build
 make -j
@@ -18,17 +19,43 @@ make -j
 
 ## How to run
 
+The emulator has two running modes: default and script.
+
+To run the emulator on default just run the command
+
 ```bash
 ./build/chip8 rom.bin
 ```
 
-will start the emulator and execute chip-8 rom provided as argument.
+and the emulator will start up and execute chip-8 rom provided as argument.
 
-The emulator also provides a script mode, where you can provide a `config.lua` file to modify Emulator startup configuration.
+In script mode, the startup configuration and runtime behavior can be modified using the Lua programming language. The project already provides both scripts with default values in [scripts](scripts/) folder. Use `-s` option to run the emulator in script mode.
 
 ```bash
-./build/chip8 -s
+./build/chip8 -s scripts/config.lua scripts/run.lua
 ```
+
+## Keyboard Layout
+
+Back in the days CHIP-8 were used with computers with heaxadecimal keypads 
+
+| 1   | 2   | 3   | C   |
+| --- | --- | --- | --- |
+| 4   | 5   | 6   | D   |
+| 7   | 8   | 9   | E   |
+| A   | 0   | B   | F   |
+
+The keypad-keyboard mapping used in this emulator is
+
+
+
+| 1   | 2   | 3   | 4   |
+| --- | --- | --- | --- |
+| Q   | W   | E   | R   |
+| A   | S   | D   | F   |
+| Z   | X   | C   | V   |
+
+which is based on QWERTY keyboard layout.
 
 ## Supported CHIP8 Opcodes
 
