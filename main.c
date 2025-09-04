@@ -3,11 +3,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include <log.h>
-
-#define BIN_BUFFER_SIZE         0xFFF
-
-//#define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
@@ -18,16 +13,14 @@
 #include <chip8.h>
 #include <display.h>
 #include <keyboard.h>
-#include <utilities.h>
 #include <script.h>
-
+#include <log.h>
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
-static uint8_t display_scale_factor = 8;                         //factor to scale up original 64 x 32 CHIP-8 display 
-
-#define WINDOW_WIDTH 512
-#define WINDOW_HEIGHT 256
+static uint8_t display_scale_factor;        //factor to scale up original 64 x 32 CHIP-8 display 
+static uint32_t window_width;
+static uint32_t window_height;
 
 void keyboard_handler(SDL_Scancode sc)
 {
@@ -93,7 +86,7 @@ void display_handler(uint8_t disp[CHIP8_DISPLAY_HEIGHT][CHIP8_DISPLAY_WIDTH])
             if (disp[i][j] == 0)
                 continue;
             //center CHIP-8 display based on current window dimensions
-            float col = display_scale_factor*j + (WINDOW_WIDTH / 2) - display_scale_factor*(CHIP8_DISPLAY_WIDTH / 2);
+            float col = display_scale_factor*j + (window_width / 2) - display_scale_factor*(CHIP8_DISPLAY_WIDTH / 2);
             float row = display_scale_factor*i;
             for(int dy = 0; dy < display_scale_factor; ++dy){
                 uint32_t dy_row = row + dy;
@@ -113,6 +106,8 @@ int main(int argc, char *argv[]) {
 
     bool debug_mode = false;
     bool script_mode = false;
+    const char rom[256];
+    memset((uint8_t *)rom, 0, 256);
 
     if (argc < 2) {
         fprintf(stderr, "Usage: chip8 [rom.bin | -s] [config_script] [run_script]\n");
@@ -124,24 +119,9 @@ int main(int argc, char *argv[]) {
                 fprintf(stderr, "missing arguments after -s option\n");
                 fprintf(stderr, "Usage: chip8 [rom.bin | -s] [config_script] [run_script]\n");
                 exit(1);
-            }
-                
+            }         
             script_mode = true;
     } 
-
-    SDL_SetAppMetadata("CHIP-8 Emulator", "1.0", "Emulator");
-
-    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
-        SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    if (!SDL_CreateWindowAndRenderer("chip8", WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
-        SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    const char *rom = NULL;
 
     if(script_mode) {
         lua_State *L = luaL_newstate();
@@ -159,31 +139,46 @@ int main(int argc, char *argv[]) {
             exit(1);
         }
 
-        lua_pushstring(L, "rom_filename");
-        lua_gettable(L, -2);
-    
-        if (lua_isstring(L, -1) & !lua_isnumber(L, -1))
-            rom = lua_tostring(L, -1);    
-        
+        chip8_lua_get_string(L, "rom_filename", (uint8_t *)rom);
         if (rom[0]== '\0'){
             fprintf(stderr, "[config.lua] rom filename not valid\n");
             lua_close(L);
             exit(1);
         }
-
-        lua_pop(L, 1);
         
-        lua_pushstring(L, "debug_mode");
-        lua_gettable(L, -2);
-        debug_mode = lua_isboolean(L, -1) ? lua_toboolean(L, -1): false;
+        debug_mode = chip8_lua_get_boolean(L, "debug_mode");
+        
+        window_width = chip8_lua_get_integer(L, "window_width");
+        window_height = chip8_lua_get_integer(L, "window_height");
+        display_scale_factor =  chip8_lua_get_integer(L, "scale_factor");
 
         lua_close(L);
     } else {
-        rom = argv[1];
+        memcpy((uint8_t *)rom, argv[1], strlen(argv[1]));
         debug_mode = false;
+        display_scale_factor = 4; 
+        window_width = 256;
+        window_height = 128;
     }
 
-    uint8_t buffer[BIN_BUFFER_SIZE];
+    //fallback to default dimensions if zero
+    window_width = window_width == 0 ? 256 : window_width;
+    window_height = window_height == 0 ? 128 : window_height;
+    display_scale_factor = display_scale_factor == 0 ? 4 : display_scale_factor;
+    
+    SDL_SetAppMetadata("CHIP-8 Emulator", "1.0", "Emulator");
+
+    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
+        SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
+    if (!SDL_CreateWindowAndRenderer("chip8", window_width, window_height, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
+        SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
+    uint8_t buffer[CHIP8_MEMORY_BUFFER];
     FILE *fp = NULL;
     fp = fopen(rom, "rb");
     
@@ -192,7 +187,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     
-    size_t bytes = fread(buffer, sizeof(uint8_t), BIN_BUFFER_SIZE, fp);
+    size_t bytes = fread(buffer, sizeof(uint8_t), CHIP8_MEMORY_BUFFER, fp);
     fclose(fp);
 
     chip8_config_t cfg = {

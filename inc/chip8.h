@@ -2,6 +2,8 @@
 #define __CHIP8_H__
 
 #include <stdint.h>
+#include <stdlib.h>
+
 #include <log.h>
 #include <display.h>
 #include <keyboard.h>
@@ -9,11 +11,20 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-//////////////////// MEMORY LAYOUT AND SIZE //////////////////////////////////////////
-#define ROM_INIT    (0x200)
-#define FONTS_INIT  (0x050)
-#define MEMORY_SIZE (1 << 12)
-#define STACK_SIZE  (24)
+
+///////////////////// UTILITIES //////////////////////////////////////////////////////
+#define ARRAY_LEN(arr, type)    (sizeof(arr) / sizeof(type))   
+#define RANDI()                 (rand() % (UINT8_MAX + 1))
+#define TIME_60HZ_MS            ((1.0 / 60.0) * 1000.0)
+
+
+
+//////////////////// MEMORY LAYOUT ///////////////////////////////////////////////////
+#define MEMORY_SIZE                 (1 << 12)
+#define CHIP8_MEMORY_BUFFER         (MEMORY_SIZE - 1)
+#define ROM_INIT                    (0x200)
+#define FONTS_INIT                  (0x050)
+#define STACK_SIZE                  (24)
 
 typedef enum {
     CHIP8_V0,
@@ -80,8 +91,7 @@ typedef struct{
 
 //////////////////// API /////////////////////////////////////////////////////////////
 void chip8_init(chip8_config_t *);
-void chip8_load_fonts(void);
-void chip8_load_memory(uint8_t *,size_t);
+void chip8_load_memory(uint8_t *,size_t, size_t);
 void chip8_dump_memory(void);
 void chip8_clock_60hz();
 void chip8_step();

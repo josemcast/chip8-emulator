@@ -6,7 +6,6 @@
 #include <display.h>
 #include <keyboard.h>
 #include <font.h>
-#include <utilities.h>
 
 #define CHIP8_LOG_IMPLEMENTATION
 #include <log.h>
@@ -21,8 +20,11 @@ void chip8_init(chip8_config_t *config){
     
     init_log(config->log_enable, config->log_type, config->log_filename);
 
-    chip8_load_fonts();
-    chip8_load_memory(config->rom, config->rom_size);
+    CHIP8_TRACELOG(CHIP8_LOG_INFO, "Loading fonts at 0x%03x\n", FONTS_INIT);
+    chip8_load_memory(chip8_fonts, ARRAY_LEN(chip8_fonts, uint8_t), FONTS_INIT);
+
+    CHIP8_TRACELOG(CHIP8_LOG_INFO, "Loading rom: Addr 0x%03x with size 0x%lx\n", ROM_INIT, config->rom_size);
+    chip8_load_memory(config->rom, config->rom_size, ROM_INIT);
     
     vm.pc = (vm.memory + ROM_INIT);
     memset(vm.registers,0, VX_COUNT);
@@ -37,23 +39,10 @@ void chip8_init(chip8_config_t *config){
     running = 1;
 }
 
-void chip8_load_memory(uint8_t *bin, size_t size){
-    CHIP8_TRACELOG(CHIP8_LOG_INFO, "Loading binary into memory...Start addr 0x%x with size 0x%lx\n", ROM_INIT, size);
-    uint8_t *dst = (vm.memory + ROM_INIT);
-    uint8_t *src = (uint8_t*)bin;
+void chip8_load_memory(uint8_t *src, size_t size, size_t offset) {
+    uint8_t *dst = (vm.memory + offset);
     uint16_t i = 0;
-    while(i < ( size)){
-        *dst++ = *src++;
-        ++i;
-    }
-}
-
-void chip8_load_fonts(){
-    CHIP8_TRACELOG(CHIP8_LOG_INFO, "Loading fonts at 0x%x\n", FONTS_INIT);
-    uint8_t *dst = (vm.memory + FONTS_INIT);
-    uint8_t *src = chip8_fonts;
-    uint16_t i = 0;
-    while(i < (ARRAY_LEN(chip8_fonts, uint8_t))){
+    while(i < (size)){
         *dst++ = *src++;
         ++i;
     }

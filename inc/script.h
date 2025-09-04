@@ -5,6 +5,16 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+
+
+const char *chip8_lua_get_string(lua_State *, const char*, uint8_t *);
+bool chip8_lua_get_boolean(lua_State *, const char*);
+int chip8_lua_get_integer(lua_State *, const char*);
 void chip8_script_run(const char*);
 
 #ifdef __cplusplus
