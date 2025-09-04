@@ -69,6 +69,37 @@ static int chip8_lib(lua_State *L) {
     return 1;
 }
 
+void chip8_script_load_conf(const char*script_name, global_conf_t *conf) {
+    lua_State *L = luaL_newstate();
+    luaL_openlibs(L);
+
+    if(luaL_dofile(L, script_name) != LUA_OK) {
+        fprintf(stderr,"Could not load config file: %s\n", lua_tostring(L, -1));
+        lua_close(L);
+        exit(1);
+    }
+
+    if(!lua_istable(L, -1)){
+        fprintf(stderr, "[config.lua] return value is not a table\n");
+        lua_close(L);
+        exit(1);
+    }
+
+    chip8_lua_get_string(L, "rom_filename", (uint8_t *)conf->rom_filename);
+    if (conf->rom_filename[0]== '\0'){
+        fprintf(stderr, "[config.lua] rom filename not valid\n");
+        lua_close(L);
+        exit(1);
+    }
+        
+    conf->debug_mode = chip8_lua_get_boolean(L, "debug_mode");
+    
+    conf->window_width = chip8_lua_get_integer(L, "window_width");
+    conf->window_height = chip8_lua_get_integer(L, "window_height");
+    conf->display_scale_factor =  chip8_lua_get_integer(L, "scale_factor");
+    lua_close(L);
+}
+
 void chip8_script_run(const char* script){
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);

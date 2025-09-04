@@ -17,7 +17,14 @@ extern "C" {
 #define RANDI()                 (rand() % (UINT8_MAX + 1))
 #define TIME_60HZ_MS            ((1.0 / 60.0) * 1000.0)
 
-
+typedef struct {
+    uint32_t display_scale_factor;
+    uint32_t window_width;
+    uint32_t window_height;
+    bool script_mode;
+    bool debug_mode;
+    const char rom_filename[256];
+}global_conf_t;
 
 //////////////////// MEMORY LAYOUT ///////////////////////////////////////////////////
 #define MEMORY_SIZE                 (1 << 12)
