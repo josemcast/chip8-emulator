@@ -12,7 +12,7 @@ include_directories(
 
 file(GLOB src "src/*.c")
 
-add_executable(chip8 main.c ${src})
+add_executable(chip8 ${src})
 
 target_compile_options(chip8 PRIVATE -g -Wall -Werror)
 
